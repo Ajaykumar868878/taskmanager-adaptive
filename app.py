@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24))
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL',
-    'sqlite:///smart_task_manager.db'
+    'sqlite:///smart_task_manager_v2.db'
 )
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -290,7 +290,7 @@ def ai_assistant_response(user_message, user_id):
 def index():
     if 'user_id' in session:
         return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
+    return render_template('landing.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -413,7 +413,8 @@ def dashboard():
                            blocked_tasks=blocked_tasks,
                            stale_tasks=stale_tasks,
                            upcoming_deadlines=upcoming_deadlines,
-                           ai_message=ai_message)
+                           ai_message=ai_message,
+                           date=date)
 
 # ============== PROJECTS ==============
 

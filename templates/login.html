@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Login - Smart Task{% endblock %}
 {% block content %}
+<div class="text-center mb-3">
+    <a href="{{ url_for('index') }}" class="text-decoration-none fw-semibold" style="color:var(--primary-dark);">
+        <i class="bi bi-arrow-left me-1"></i> Back to Home
+    </a>
+</div>
 <div class="row justify-content-center">
     <div class="col-md-5">
         <div class="card p-4">
