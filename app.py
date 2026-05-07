@@ -135,6 +135,13 @@ class Message(db.Model):
     receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
     group = db.relationship('ChatGroup', backref='messages')
 
+class UserChatStatus(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True)
+    last_read_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='chat_status', uselist=False)
+
 # ============== DECORATORS ==============
 
 def login_required(f):
@@ -158,6 +165,28 @@ def admin_required(f):
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated_function
+
+# ============== CONTEXT PROCESSORS ==============
+
+@app.context_processor
+def inject_unread_messages():
+    has_unread = False
+    if 'user_id' in session:
+        user_id = session['user_id']
+        chat_status = UserChatStatus.query.filter_by(user_id=user_id).first()
+        last_read = chat_status.last_read_at if chat_status else datetime.min
+        # Check for messages sent to user or broadcast after last read
+        unread = Message.query.filter(
+            (Message.created_at > last_read) &
+            (Message.sender_id != user_id) &
+            (
+                (Message.receiver_id == user_id) |
+                (Message.is_broadcast == True) |
+                (Message.group_id != None)
+            )
+        ).first()
+        has_unread = unread is not None
+    return dict(has_unread_messages=has_unread)
 
 # ============== HELPERS ==============
 
@@ -577,37 +606,65 @@ def tasks():
 @app.route('/tasks/create', methods=['POST'])
 @admin_required
 def create_task():
-    title = request.form.get('title')
-    description = request.form.get('description')
-    priority = request.form.get('priority')
-    due_date = datetime.strptime(request.form.get('due_date'), '%Y-%m-%d').date()
-    assigned_to = int(request.form.get('assigned_to'))
-    project_id = int(request.form.get('project_id'))
-    parent_id = request.form.get('parent_task_id')
-    parent_task_id = int(parent_id) if parent_id else None
+    try:
+        title = request.form.get('title', '').strip()
+        if not title:
+            flash('Title is required.', 'error')
+            return redirect(url_for('tasks'))
 
-    task = Task(
-        title=title,
-        description=description,
-        priority=priority,
-        due_date=due_date,
-        assigned_to=assigned_to,
-        created_by=session['user_id'],
-        project_id=project_id,
-        parent_task_id=parent_task_id,
-        status='Todo'
-    )
-    db.session.add(task)
-    db.session.commit()
+        description = request.form.get('description', '').strip()
+        priority = request.form.get('priority', 'Medium')
 
-    # Log history
-    history = TaskHistory(task_id=task.id, new_status='Todo', changed_by=session['user_id'])
-    db.session.add(history)
-    db.session.commit()
+        due_date_str = request.form.get('due_date', '')
+        if not due_date_str:
+            flash('Due date is required.', 'error')
+            return redirect(url_for('tasks'))
+        try:
+            due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            flash('Invalid due date format.', 'error')
+            return redirect(url_for('tasks'))
 
-    assigned_user = User.query.get(assigned_to)
-    log_activity('created', 'task', task.id, f"Created task '{title}' and assigned to {assigned_user.username}")
-    flash('Task created successfully.', 'success')
+        assigned_to_str = request.form.get('assigned_to', '')
+        if not assigned_to_str:
+            flash('Assigned to is required.', 'error')
+            return redirect(url_for('tasks'))
+        assigned_to = int(assigned_to_str)
+
+        project_id_str = request.form.get('project_id', '')
+        if not project_id_str:
+            flash('Project is required.', 'error')
+            return redirect(url_for('tasks'))
+        project_id = int(project_id_str)
+
+        parent_id = request.form.get('parent_task_id', '')
+        parent_task_id = int(parent_id) if parent_id else None
+
+        task = Task(
+            title=title,
+            description=description or None,
+            priority=priority,
+            due_date=due_date,
+            assigned_to=assigned_to,
+            created_by=session['user_id'],
+            project_id=project_id,
+            parent_task_id=parent_task_id,
+            status='Todo'
+        )
+        db.session.add(task)
+        db.session.commit()
+
+        # Log history
+        history = TaskHistory(task_id=task.id, new_status='Todo', changed_by=session['user_id'])
+        db.session.add(history)
+        db.session.commit()
+
+        assigned_user = User.query.get(assigned_to)
+        log_activity('created', 'task', task.id, f"Created task '{title}' and assigned to {assigned_user.username}")
+        flash('Task created successfully.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error creating task: {str(e)}', 'error')
     return redirect(url_for('tasks'))
 
 @app.route('/tasks/<int:task_id>/update', methods=['POST'])
@@ -683,6 +740,14 @@ def chat():
     user = User.query.get(session['user_id'])
     users = User.query.filter(User.id != user.id).all()
     groups = ChatGroup.query.all()
+
+    # Mark chat as read
+    chat_status = UserChatStatus.query.filter_by(user_id=user.id).first()
+    if not chat_status:
+        chat_status = UserChatStatus(user_id=user.id)
+        db.session.add(chat_status)
+    chat_status.last_read_at = datetime.utcnow()
+    db.session.commit()
 
     # Get selected chat type and id
     chat_type = request.args.get('type', 'ai')  # ai, dm, group, broadcast

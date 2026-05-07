@@ -649,6 +649,7 @@
                     <li class="nav-item">
                         <a class="nav-link {{ 'active' if request.endpoint == 'chat' else '' }}" href="{{ url_for('chat') }}">
                             <i class="bi bi-chat-dots-fill me-1"></i> Chat
+                            {% if has_unread_messages %}<span class="badge bg-danger rounded-pill" style="font-size:0.55rem;transform:translateY(-6px);">&nbsp;</span>{% endif %}
                         </a>
                     </li>
                 </ul>
