@@ -7,7 +7,7 @@
         <p class="mb-0">Manage and track all tasks</p>
     </div>
     {% if user.role == 'admin' %}
-    <button class="btn btn-primary" id="newTaskBtn" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+    <button class="btn btn-primary" id="newTaskBtn">
         <i class="bi bi-plus-lg me-1"></i> New Task
     </button>
     {% endif %}
@@ -291,14 +291,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalEl = document.getElementById('createTaskModal');
     
     if (newTaskBtn && modalEl) {
-        // Initialize modal instance
-        const modal = new bootstrap.Modal(modalEl);
+        const modal = new bootstrap.Modal(modalEl, {
+            backdrop: true,
+            keyboard: true
+        });
         
-        // Force open on click
-        newTaskBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+        newTaskBtn.addEventListener('click', function() {
             modal.show();
         });
+        
+        // Ensure form submission closes modal properly
+        const form = document.getElementById('createTaskForm');
+        if (form) {
+            form.addEventListener('submit', function() {
+                modal.hide();
+            });
+        }
     }
 });
 </script>
