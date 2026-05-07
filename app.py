@@ -172,20 +172,23 @@ def admin_required(f):
 def inject_unread_messages():
     has_unread = False
     if 'user_id' in session:
-        user_id = session['user_id']
-        chat_status = UserChatStatus.query.filter_by(user_id=user_id).first()
-        last_read = chat_status.last_read_at if chat_status else datetime.min
-        # Check for messages sent to user or broadcast after last read
-        unread = Message.query.filter(
-            (Message.created_at > last_read) &
-            (Message.sender_id != user_id) &
-            (
-                (Message.receiver_id == user_id) |
-                (Message.is_broadcast == True) |
-                (Message.group_id != None)
-            )
-        ).first()
-        has_unread = unread is not None
+        try:
+            user_id = session['user_id']
+            chat_status = UserChatStatus.query.filter_by(user_id=user_id).first()
+            last_read = chat_status.last_read_at if chat_status else datetime.min
+            # Check for messages sent to user or broadcast after last read
+            unread = Message.query.filter(
+                (Message.created_at > last_read) &
+                (Message.sender_id != user_id) &
+                (
+                    (Message.receiver_id == user_id) |
+                    (Message.is_broadcast == True) |
+                    (Message.group_id != None)
+                )
+            ).first()
+            has_unread = unread is not None
+        except Exception:
+            pass  # Table may not exist yet
     return dict(has_unread_messages=has_unread)
 
 # ============== HELPERS ==============
@@ -742,12 +745,15 @@ def chat():
     groups = ChatGroup.query.all()
 
     # Mark chat as read
-    chat_status = UserChatStatus.query.filter_by(user_id=user.id).first()
-    if not chat_status:
-        chat_status = UserChatStatus(user_id=user.id)
-        db.session.add(chat_status)
-    chat_status.last_read_at = datetime.utcnow()
-    db.session.commit()
+    try:
+        chat_status = UserChatStatus.query.filter_by(user_id=user.id).first()
+        if not chat_status:
+            chat_status = UserChatStatus(user_id=user.id)
+            db.session.add(chat_status)
+        chat_status.last_read_at = datetime.utcnow()
+        db.session.commit()
+    except Exception:
+        db.session.rollback()  # Table may not exist yet
 
     # Get selected chat type and id
     chat_type = request.args.get('type', 'ai')  # ai, dm, group, broadcast
