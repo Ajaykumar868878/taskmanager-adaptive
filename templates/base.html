@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Task Manager{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #00acc1;
+            --primary-light: #4dd0e1;
+            --primary-dark: #0097a7;
+            --accent: #29b6f6;
+            --critical: #ef5350;
+            --warning: #ffa726;
+            --safe: #66bb6a;
+            --bg-start: #e0f7fa;
+            --bg-end: #e3f2fd;
+            --card: #ffffff;
+            --text: #263238;
+            --text-light: #78909c;
+        }
+        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body {
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            background-attachment: fixed;
+            color: var(--text);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            box-shadow: 0 2px 20px rgba(0,172,193,0.08);
+            padding: 0.75rem 0;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: var(--primary-dark) !important;
+            letter-spacing: -0.5px;
+        }
+        .navbar-brand i { color: var(--primary); }
+        .nav-link {
+            color: var(--text-light) !important;
+            font-weight: 500;
+            font-size: 0.92rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-dark) !important;
+            background: rgba(0,172,193,0.08);
+        }
+        .card {
+            border: none;
+            border-radius: 24px;
+            background: var(--card);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,172,193,0.12);
+        }
+        .stat-card {
+            border-radius: 20px;
+            padding: 1.5rem;
+            background: var(--card);
+        }
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        .badge-critical { background: #ffebee; color: #c62828; font-weight: 600; border-radius: 50px; padding: 6px 14px; font-size: 0.78rem; }
+        .badge-warning { background: #fff3e0; color: #ef6c00; font-weight: 600; border-radius: 50px; padding: 6px 14px; font-size: 0.78rem; }
+        .badge-safe { background: #e8f5e9; color: #2e7d32; font-weight: 600; border-radius: 50px; padding: 6px 14px; font-size: 0.78rem; }
+        .priority-high { background: #ffebee; color: #c62828; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .priority-medium { background: #fff3e0; color: #ef6c00; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .priority-low { background: #e8f5e9; color: #2e7d32; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .status-todo { background: #eceff1; color: #546e7a; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .status-progress { background: #e3f2fd; color: #1565c0; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .status-done { background: #e8f5e9; color: #2e7d32; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,172,193,0.3);
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,172,193,0.4);
+            background: linear-gradient(135deg, var(--primary-dark), #00838f);
+        }
+        .btn-outline-primary {
+            border: 2px solid var(--primary);
+            color: var(--primary-dark);
+            border-radius: 14px;
+            font-weight: 600;
+        }
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .btn-outline-secondary {
+            border: 2px solid #e0e0e0;
+            color: var(--text-light);
+            border-radius: 14px;
+            font-weight: 600;
+        }
+        .focus-toggle {
+            background: linear-gradient(135deg, var(--accent), #0288d1);
+            border: none;
+            color: white;
+            border-radius: 14px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 16px rgba(41,182,246,0.3);
+            transition: all 0.2s ease;
+        }
+        .focus-toggle:hover { transform: translateY(-1px); }
+        .focus-toggle.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 4px 16px rgba(0,172,193,0.3);
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 32px;
+            padding-bottom: 1.25rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 8px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 14px;
+            top: 20px;
+            width: 2px;
+            height: calc(100% - 12px);
+            background: linear-gradient(to bottom, var(--primary-light), transparent);
+        }
+        .timeline-item:last-child::after { display: none; }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .activity-item {
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .form-control, .form-select {
+            border-radius: 14px;
+            border: 2px solid #eceff1;
+            padding: 0.7rem 1rem;
+            font-weight: 500;
+            font-size: 0.92rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(77,208,225,0.15);
+        }
+        .modal-content { border-radius: 24px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+        .modal-header { border-bottom: 1px solid rgba(0,0,0,0.04); padding: 1.5rem; }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { border-top: 1px solid rgba(0,0,0,0.04); padding: 1.25rem 1.5rem; }
+        .table { font-size: 0.9rem; }
+        .table th { border-top: none; color: var(--text-light); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem 0.75rem; }
+        .table td { vertical-align: middle; padding: 1rem 0.75rem; border-color: rgba(0,0,0,0.04); }
+        .table tbody tr { transition: background 0.15s ease; }
+        .table tbody tr:hover { background: rgba(0,172,193,0.03); }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
+        .section-title { font-weight: 700; font-size: 1.15rem; color: var(--text); }
+        .progress { height: 8px; border-radius: 50px; background: #eceff1; }
+        .progress-bar { border-radius: 50px; }
+        .avatar-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+        .dropdown-menu { border-radius: 16px; border: none; box-shadow: 0 8px 32px rgba(0,0,0,0.1); padding: 0.5rem; }
+        .dropdown-item { border-radius: 10px; padding: 0.6rem 1rem; font-weight: 500; font-size: 0.9rem; }
+        .dropdown-item:hover { background: rgba(0,172,193,0.08); color: var(--primary-dark); }
+        .alert { border-radius: 16px; border: none; font-weight: 500; }
+        .page-header { margin-bottom: 2rem; }
+        .page-header h2 { font-weight: 800; font-size: 1.75rem; letter-spacing: -0.5px; }
+        .page-header p { color: var(--text-light); font-size: 0.95rem; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if session.user_id %}
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <i class="bi bi-lightning-charge-fill me-2"></i>Smart Task
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon" style="filter: invert(0.5);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav me-auto gap-1">
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}">
+                            <i class="bi bi-grid-fill me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'projects' else '' }}" href="{{ url_for('projects') }}">
+                            <i class="bi bi-folder-fill me-1"></i> Projects
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'tasks' else '' }}" href="{{ url_for('tasks') }}">
+                            <i class="bi bi-check2-circle me-1"></i> Tasks
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.endpoint == 'chat' else '' }}" href="{{ url_for('chat') }}">
+                            <i class="bi bi-chat-dots-fill me-1"></i> Chat
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <div class="avatar-circle me-2" style="width:32px;height:32px;font-size:0.75rem;">{{ session.username[0]|upper }}</div>
+                            <span>{{ session.username }}</span>
+                            {% if session.role == 'admin' %}<span class="badge ms-2" style="background:#e0f7fa;color:var(--primary-dark);border-radius:50px;font-size:0.7rem;">ADMIN</span>{% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="{% if session.user_id %}py-4{% else %}vh-100 d-flex align-items-center{% endif %}">
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert" style="margin-bottom:1.5rem;">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
