@@ -144,12 +144,13 @@
                 {% else %}
                     <div class="empty-state">
                         {% if ai_mode %}
-                        <i class="bi bi-robot fs-1" style="color:#b2ebf2;"></i>
-                        <p class="mt-2">Start a conversation with the AI Assistant!</p>
-                        <small class="text-muted">Try asking: "How many tasks do I have?" or "Give me a productivity tip"</small>
+                        <i class="bi bi-robot"></i>
+                        <h5>AI Assistant</h5>
+                        <p class="small">Try asking: "How many tasks do I have?" or "Give me a productivity tip"</p>
                         {% else %}
-                        <i class="bi bi-chat-dots fs-1" style="color:#b2ebf2;"></i>
-                        <p class="mt-2">No messages yet. Start the conversation!</p>
+                        <i class="bi bi-chat-dots"></i>
+                        <h5>No messages yet</h5>
+                        <p class="small">Start the conversation!</p>
                         {% endif %}
                     </div>
                 {% endif %}

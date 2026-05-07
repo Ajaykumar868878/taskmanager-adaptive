@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% block title %}{{ task.title }} - Task Detail{% endblock %}
 {% block content %}
-<div class="mb-3">
-    <a href="{{ url_for('tasks') }}" class="text-decoration-none fw-semibold" style="color:var(--primary-dark);">
+<div class="mb-3 animate-fade-up">
+    <a href="{{ url_for('tasks') }}" class="text-decoration-none fw-semibold text-primary">
         <i class="bi bi-arrow-left me-1"></i> Back to Tasks
     </a>
 </div>
 
 <div class="row g-3">
     <div class="col-lg-8">
-        <div class="card p-4">
+        <div class="card p-4 animate-fade-up">
             <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
                 <div>
                     <h3 class="fw-bold mb-2">{{ task.title }}</h3>
@@ -43,7 +43,7 @@
 
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
-                    <div class="p-3 rounded-4" style="background:#e1f5fe;">
+                    <div class="p-3 rounded-3" style="background:#eff6ff;">
                         <small class="text-muted d-block mb-1" style="font-size:0.78rem;">Assigned To</small>
                         <div class="d-flex align-items-center">
                             <div class="avatar-circle me-2">{{ task.assignee.username[0]|upper }}</div>
@@ -52,23 +52,23 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-3 rounded-4" style="background:#f3e5f5;">
+                    <div class="p-3 rounded-3" style="background:#f5f3ff;">
                         <small class="text-muted d-block mb-1" style="font-size:0.78rem;">Created By</small>
                         <div class="d-flex align-items-center">
-                            <div class="avatar-circle me-2" style="background:linear-gradient(135deg,#ce93d8,#ab47bc);">{{ task.creator.username[0]|upper }}</div>
+                            <div class="avatar-circle me-2" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">{{ task.creator.username[0]|upper }}</div>
                             <span class="fw-semibold">{{ task.creator.username }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-3 rounded-4" style="background:#fff3e0;">
+                    <div class="p-3 rounded-3" style="background:#fffbeb;">
                         <small class="text-muted d-block mb-1" style="font-size:0.78rem;">Due Date</small>
-                        <span class="fw-semibold"><i class="bi bi-calendar-event me-1" style="color:#ef6c00;"></i>{{ task.due_date.strftime('%b %d, %Y') }}</span>
+                        <span class="fw-semibold"><i class="bi bi-calendar-event me-1 text-warning"></i>{{ task.due_date.strftime('%b %d, %Y') }}</span>
                     </div>
                 </div>
                 {% if task.parent %}
                 <div class="col-md-6">
-                    <div class="p-3 rounded-4" style="background:#fce4ec;">
+                    <div class="p-3 rounded-3" style="background:#fef2f2;">
                         <small class="text-muted d-block mb-1" style="font-size:0.78rem;">Depends On</small>
                         <div class="d-flex align-items-center">
                             <i class="bi bi-link-45deg me-2 text-danger"></i>
@@ -79,7 +79,7 @@
                 {% endif %}
                 {% if task.child_tasks %}
                 <div class="col-md-6">
-                    <div class="p-3 rounded-4" style="background:#e8f5e9;">
+                    <div class="p-3 rounded-3" style="background:#f0fdf4;">
                         <small class="text-muted d-block mb-1" style="font-size:0.78rem;">Dependent Tasks</small>
                         <div class="d-flex align-items-center">
                             <i class="bi bi-diagram-3 me-2 text-success"></i>
@@ -121,8 +121,8 @@
     </div>
 
     <div class="col-lg-4">
-        <div class="card p-4">
-            <h5 class="section-title mb-4"><i class="bi bi-clock-history text-primary me-2"></i>Task History</h5>
+        <div class="card p-4 animate-fade-up" style="animation-delay: 0.15s;">
+            <h5 class="section-title mb-4"><i class="bi bi-clock-history text-primary me-1"></i>Task History</h5>
             {% if histories %}
             <div class="timeline">
                 <div class="timeline-item">
@@ -145,9 +145,10 @@
                 {% endfor %}
             </div>
             {% else %}
-            <div class="empty-state py-4">
-                <i class="bi bi-clock fs-1" style="color:#b2ebf2;"></i>
-                <p class="mt-2">No history yet.</p>
+            <div class="empty-state">
+                <i class="bi bi-clock"></i>
+                <h5>No history yet</h5>
+                <p class="small">Task actions will appear here.</p>
             </div>
             {% endif %}
         </div>

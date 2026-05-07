@@ -1,177 +1,123 @@
 {% extends "base.html" %}
 {% block title %}Dashboard - Smart Task{% endblock %}
 {% block content %}
-<!-- Hero Statement -->
-<div class="p-4 mb-4 rounded-4" style="background: linear-gradient(135deg, #e0f7fa, #e3f2fd); border: 1px solid rgba(0,172,193,0.15);">
-    <div class="row align-items-center">
+<!-- Hero -->
+<div class="card p-4 mb-4 animate-fade-up" style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border-color: rgba(14,165,233,0.15);">
+    <div class="row align-items-center g-3">
         <div class="col-md-8">
-            <h1 class="fw-bold mb-2" style="font-size: 1.6rem; color: var(--primary-dark);">Welcome back, {{ user.username }}!</h1>
-            <p class="mb-0" style="color: #546e7a; font-size: 0.95rem;">
-                <strong>Smart Task</strong> &mdash; An adaptive productivity platform that identifies risks, improves collaboration, and helps teams focus on high-impact work.
-            </p>
+            <h1 class="fw-bold mb-1" style="font-size: 1.5rem; letter-spacing: -0.025em;">Welcome back, {{ user.username }}!</h1>
+            <p class="mb-0 text-secondary" style="font-size: 0.875rem;">Smart Task identifies risks, improves collaboration, and helps your team focus on high-impact work.</p>
         </div>
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <a href="{{ url_for('dashboard', focus='on' if not focus_mode else '') }}" class="focus-toggle {{ 'active' if focus_mode else '' }} text-decoration-none">
-                <i class="bi bi-eye-fill me-1"></i> Focus Mode {{ 'ON' if focus_mode else 'OFF' }}
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('dashboard', focus='on' if not focus_mode else '') }}" class="focus-toggle {{ 'active' if focus_mode else '' }} text-decoration-none d-inline-flex align-items-center gap-2">
+                <i class="bi bi-eye-fill"></i> Focus Mode {{ 'ON' if focus_mode else 'OFF' }}
             </a>
         </div>
     </div>
 </div>
 
 {% if focus_mode %}
-<div class="alert alert-info mb-4" style="background: #e1f5fe; color: #01579b;">
-    <i class="bi bi-info-circle-fill me-2"></i><strong>Focus Mode Active:</strong> Showing only your tasks, high priority tasks, and risky tasks.
+<div class="alert alert-info mb-4 animate-fade-up">
+    <i class="bi bi-info-circle-fill me-2"></i><strong>Focus Mode Active</strong> &mdash; Showing your tasks, high priority items, and risky tasks only.
 </div>
 {% endif %}
 
-<!-- AI Insight Banner -->
-<div class="card p-4 mb-4" style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); border: none;">
-    <div class="d-flex align-items-center">
-        <div class="stat-icon me-3" style="background: linear-gradient(135deg, #ce93d8, #ab47bc); color: white; width: 52px; height: 52px;">
-            <i class="bi bi-robot fs-4"></i>
-        </div>
-        <div>
-            <h6 class="fw-bold mb-1" style="color: #4a148c;"><i class="bi bi-stars me-1"></i>AI Insight</h6>
-            <p class="mb-0" style="color: #6a1b9a;">{{ ai_message }}</p>
-        </div>
+<!-- AI Insight -->
+<div class="ai-insight-banner mb-4 animate-fade-up">
+    <div class="ai-icon"><i class="bi bi-stars"></i></div>
+    <div>
+        <div class="fw-bold text-sm mb-1">AI Assistant Insight</div>
+        <p class="mb-0 text-secondary text-sm">{{ ai_message }}</p>
     </div>
 </div>
 
-<!-- Stats Cards -->
+<!-- SVG Defs for circular progress -->
+<svg width="0" height="0" style="position:absolute;">
+    <defs>
+        <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#0ea5e9;" />
+            <stop offset="100%" style="stop-color:#06b6d4;" />
+        </linearGradient>
+    </defs>
+</svg>
+
+<!-- Stats -->
 <div class="row g-3 mb-4">
+    {% set stats = [
+        ('Productivity', insights.productivity_pct, 'bi-graph-up-arrow', '#0ea5e9'),
+        ('Completion', insights.completion_rate, 'bi-check-circle-fill', '#10b981'),
+        ('Overdue Rate', insights.overdue_rate, 'bi-exclamation-triangle-fill', '#ef4444'),
+        ('Avg Time', insights.avg_completion_days, 'bi-clock-history', '#f59e0b')
+    ] %}
+    {% for label, value, icon, color in stats %}
     <div class="col-sm-6 col-xl-3">
-        <div class="stat-card card-hover">
-            <div class="d-flex align-items-center">
-                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #e1f5fe, #b3e5fc); color: #0288d1;">
-                    <i class="bi bi-graph-up-arrow"></i>
+        <div class="stat-card animate-fade-up" style="animation-delay: {{ loop.index * 0.1 }}s;">
+            <div class="d-flex align-items-center gap-3">
+                <div class="circular-progress">
+                    <svg width="72" height="72" viewBox="0 0 72 72">
+                        <circle class="bg" cx="36" cy="36" r="30"/>
+                        <circle class="fg" cx="36" cy="36" r="30"
+                            stroke-dasharray="188.5"
+                            stroke-dashoffset="{{ 188.5 - (value / 100 * 188.5) if loop.index < 4 else 188.5 - (value / 20 * 188.5) }}"/>
+                    </svg>
+                    <div class="progress-text">{{ value }}{% if loop.index < 4 %}%{% else %}d{% endif %}</div>
                 </div>
                 <div>
-                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Team Productivity</h6>
-                    <h3 class="fw-bold mb-0">{{ insights.productivity_pct }}%</h3>
+                    <div class="stat-label">{{ label }}</div>
+                    <div class="stat-value">{{ value }}{% if loop.index < 4 %}%{% else %}d{% endif %}</div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card card-hover">
-            <div class="d-flex align-items-center">
-                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32;">
-                    <i class="bi bi-check-circle-fill"></i>
-                </div>
-                <div>
-                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Completion Rate</h6>
-                    <h3 class="fw-bold mb-0">{{ insights.completion_rate }}%</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card card-hover">
-            <div class="d-flex align-items-center">
-                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #ffebee, #ffcdd2); color: #c62828;">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                </div>
-                <div>
-                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Overdue Rate</h6>
-                    <h3 class="fw-bold mb-0">{{ insights.overdue_rate }}%</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6 col-xl-3">
-        <div class="stat-card card-hover">
-            <div class="d-flex align-items-center">
-                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #ef6c00;">
-                    <i class="bi bi-clock-history"></i>
-                </div>
-                <div>
-                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Avg Completion Time</h6>
-                    <h3 class="fw-bold mb-0">{{ insights.avg_completion_days }}d</h3>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% endfor %}
 </div>
 
-<!-- Risk & Priority Section -->
+<!-- Risk Overview & Priority -->
 <div class="row g-3 mb-4">
     <div class="col-lg-4">
-        <div class="card p-4 h-100">
-            <h5 class="section-title mb-4"><i class="bi bi-shield-exclamation text-danger me-2"></i>Risk Overview</h5>
+        <div class="card p-4 h-100 animate-fade-up">
+            <h5 class="section-title mb-4"><i class="bi bi-shield-exclamation text-danger me-1"></i>Risk Overview</h5>
             {% set total_risk = risk_counts.critical + risk_counts.warning + risk_counts.safe %}
-            {% set pct_critical = (risk_counts.critical / total_risk * 100) if total_risk > 0 else 0 %}
-            {% set pct_warning = (risk_counts.warning / total_risk * 100) if total_risk > 0 else 0 %}
-            {% set pct_safe = (risk_counts.safe / total_risk * 100) if total_risk > 0 else 0 %}
             {% if total_risk > 0 %}
             <div class="mb-4">
-                <div class="d-flex justify-content-between small mb-1">
-                    <span class="fw-semibold">Critical</span>
-                    <span class="fw-bold">{{ risk_counts.critical }}</span>
-                </div>
-                <div class="progress mb-3">
-                    <div class="progress-bar bg-danger" style="width: {{ pct_critical }}%"></div>
-                </div>
-                <div class="d-flex justify-content-between small mb-1">
-                    <span class="fw-semibold">Warning</span>
-                    <span class="fw-bold">{{ risk_counts.warning }}</span>
-                </div>
-                <div class="progress mb-3">
-                    <div class="progress-bar" style="width: {{ pct_warning }}%; background: #ffa726;"></div>
-                </div>
-                <div class="d-flex justify-content-between small mb-1">
-                    <span class="fw-semibold">Safe</span>
-                    <span class="fw-bold">{{ risk_counts.safe }}</span>
-                </div>
-                <div class="progress">
-                    <div class="progress-bar bg-success" style="width: {{ pct_safe }}%"></div>
-                </div>
+                <div class="d-flex justify-content-between small fw-medium mb-1"><span class="text-secondary">Critical</span><span>{{ risk_counts.critical }}</span></div>
+                <div class="progress mb-3"><div class="progress-bar bg-danger" style="width: {{ (risk_counts.critical / total_risk * 100) }}%"></div></div>
+                <div class="d-flex justify-content-between small fw-medium mb-1"><span class="text-secondary">Warning</span><span>{{ risk_counts.warning }}</span></div>
+                <div class="progress mb-3"><div class="progress-bar" style="width: {{ (risk_counts.warning / total_risk * 100) }}%; background: #f59e0b;"></div></div>
+                <div class="d-flex justify-content-between small fw-medium mb-1"><span class="text-secondary">Safe</span><span>{{ risk_counts.safe }}</span></div>
+                <div class="progress"><div class="progress-bar bg-success" style="width: {{ (risk_counts.safe / total_risk * 100) }}%"></div></div>
             </div>
             {% endif %}
             <div class="row g-2 text-center">
-                <div class="col-4">
-                    <div class="p-2 rounded-3" style="background:#ffebee;">
-                        <h5 class="fw-bold text-danger mb-0">{{ risk_counts.critical }}</h5>
-                        <small class="text-muted">Critical</small>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="p-2 rounded-3" style="background:#fff3e0;">
-                        <h5 class="fw-bold mb-0" style="color:#ef6c00;">{{ risk_counts.warning }}</h5>
-                        <small class="text-muted">Warning</small>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="p-2 rounded-3" style="background:#e8f5e9;">
-                        <h5 class="fw-bold text-success mb-0">{{ risk_counts.safe }}</h5>
-                        <small class="text-muted">Safe</small>
-                    </div>
-                </div>
+                <div class="col-4"><div class="p-2 rounded-3" style="background:#fef2f2;"><h5 class="fw-bold text-danger mb-0">{{ risk_counts.critical }}</h5><small class="text-muted">Critical</small></div></div>
+                <div class="col-4"><div class="p-2 rounded-3" style="background:#fffbeb;"><h5 class="fw-bold mb-0" style="color:#d97706;">{{ risk_counts.warning }}</h5><small class="text-muted">Warning</small></div></div>
+                <div class="col-4"><div class="p-2 rounded-3" style="background:#f0fdf4;"><h5 class="fw-bold text-success mb-0">{{ risk_counts.safe }}</h5><small class="text-muted">Safe</small></div></div>
             </div>
         </div>
     </div>
     <div class="col-lg-8">
-        <div class="card p-4 h-100">
-            <h5 class="section-title mb-4"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Priority Breakdown</h5>
+        <div class="card p-4 h-100 animate-fade-up">
+            <h5 class="section-title mb-4"><i class="bi bi-bar-chart-fill text-primary me-1"></i>Priority Distribution</h5>
             <div class="row text-center g-4">
                 <div class="col-md-4">
-                    <div class="p-4 rounded-4" style="background: linear-gradient(135deg, #ffebee, #ffcdd2);">
+                    <div class="p-4 rounded-3 hover-lift" style="background: linear-gradient(135deg, #fef2f2, #fff5f5);">
                         <i class="bi bi-arrow-up-circle-fill text-danger fs-1 mb-2 d-block"></i>
-                        <h2 class="fw-bold mb-1">{{ insights.high_priority }}</h2>
-                        <span class="fw-semibold text-muted">High Priority</span>
+                        <div class="stat-value">{{ insights.high_priority }}</div>
+                        <div class="stat-label">High Priority</div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-4 rounded-4" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2);">
-                        <i class="bi bi-dash-circle-fill fs-1 mb-2 d-block" style="color:#ef6c00;"></i>
-                        <h2 class="fw-bold mb-1">{{ insights.medium_priority }}</h2>
-                        <span class="fw-semibold text-muted">Medium Priority</span>
+                    <div class="p-4 rounded-3 hover-lift" style="background: linear-gradient(135deg, #fffbeb, #fffbf0);">
+                        <i class="bi bi-dash-circle-fill fs-1 mb-2 d-block" style="color:#f59e0b;"></i>
+                        <div class="stat-value">{{ insights.medium_priority }}</div>
+                        <div class="stat-label">Medium Priority</div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="p-4 rounded-4" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9);">
+                    <div class="p-4 rounded-3 hover-lift" style="background: linear-gradient(135deg, #f0fdf4, #f5fff5);">
                         <i class="bi bi-arrow-down-circle-fill text-success fs-1 mb-2 d-block"></i>
-                        <h2 class="fw-bold mb-1">{{ insights.low_priority }}</h2>
-                        <span class="fw-semibold text-muted">Low Priority</span>
+                        <div class="stat-value">{{ insights.low_priority }}</div>
+                        <div class="stat-label">Low Priority</div>
                     </div>
                 </div>
             </div>
@@ -179,171 +125,172 @@
     </div>
 </div>
 
-<!-- Special Sections: Overdue, Blocked, Unassigned -->
+<!-- Special Sections -->
 <div class="row g-3 mb-4">
     <div class="col-lg-4">
-        <div class="card p-4 h-100">
-            <h5 class="section-title mb-3"><i class="bi bi-calendar-x text-danger me-2"></i>Overdue Tasks</h5>
+        <div class="card p-4 h-100 animate-fade-up">
+            <h5 class="section-title mb-3"><i class="bi bi-calendar-x text-danger me-1"></i>Overdue Tasks</h5>
             {% if overdue_tasks %}
-            <div style="max-height: 260px; overflow-y: auto;">
+            <div style="max-height: 280px; overflow-y: auto;">
                 {% for t in overdue_tasks %}
-                <div class="d-flex align-items-center p-2 mb-2 rounded-3" style="background: #ffebee;">
-                    <div class="flex-grow-1">
-                        <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small">{{ t.title }}</a>
+                <div class="d-flex align-items-center p-2 mb-2 rounded-3 hover-lift" style="background: #fef2f2; border: 1px solid #fecaca;">
+                    <div class="flex-grow-1 min-width-0">
+                        <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small d-block text-truncate">{{ t.title }}</a>
                         <div class="text-muted" style="font-size:0.75rem;">{{ t.due_date.strftime('%b %d') }} &middot; {{ t.project.name }}</div>
                     </div>
-                    <span class="badge badge-critical ms-2" style="font-size:0.65rem;">Critical</span>
+                    <span class="badge badge-critical ms-2">Critical</span>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
             <div class="empty-state">
-                <i class="bi bi-check-circle fs-2" style="color:#b2ebf2;"></i>
-                <p class="mt-2 small">No overdue tasks!</p>
+                <i class="bi bi-check-circle"></i>
+                <h5>No overdue tasks!</h5>
+                <p class="small">All tasks are on schedule.</p>
             </div>
             {% endif %}
         </div>
     </div>
     <div class="col-lg-4">
-        <div class="card p-4 h-100">
-            <h5 class="section-title mb-3"><i class="bi bi-lock-fill text-warning me-2"></i>Blocked Tasks</h5>
+        <div class="card p-4 h-100 animate-fade-up">
+            <h5 class="section-title mb-3"><i class="bi bi-lock-fill text-warning me-1"></i>Blocked Tasks</h5>
             {% if blocked_tasks %}
-            <div style="max-height: 260px; overflow-y: auto;">
+            <div style="max-height: 280px; overflow-y: auto;">
                 {% for t in blocked_tasks %}
-                <div class="d-flex align-items-center p-2 mb-2 rounded-3" style="background: #fff3e0;">
-                    <div class="flex-grow-1">
-                        <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small">{{ t.title }}</a>
+                <div class="d-flex align-items-center p-2 mb-2 rounded-3 hover-lift" style="background: #fffbeb; border: 1px solid #fde68a;">
+                    <div class="flex-grow-1 min-width-0">
+                        <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small d-block text-truncate">{{ t.title }}</a>
                         <div class="text-muted" style="font-size:0.75rem;">Blocked by: {{ t.parent.title }}</div>
                     </div>
-                    <span class="badge badge-warning ms-2" style="font-size:0.65rem;">Blocked</span>
+                    <span class="badge badge-warning ms-2">Blocked</span>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
             <div class="empty-state">
-                <i class="bi bi-unlock fs-2" style="color:#b2ebf2;"></i>
-                <p class="mt-2 small">No blocked tasks!</p>
+                <i class="bi bi-unlock"></i>
+                <h5>Workflow is clear!</h5>
+                <p class="small">No blocked tasks detected.</p>
             </div>
             {% endif %}
         </div>
     </div>
     <div class="col-lg-4">
-        <div class="card p-4 h-100">
-            <h5 class="section-title mb-3"><i class="bi bi-inbox text-muted me-2"></i>Stale Tasks</h5>
+        <div class="card p-4 h-100 animate-fade-up">
+            <h5 class="section-title mb-3"><i class="bi bi-inbox text-muted me-1"></i>Stale Tasks</h5>
             {% if stale_tasks %}
-            <div style="max-height: 260px; overflow-y: auto;">
+            <div style="max-height: 280px; overflow-y: auto;">
                 {% for t in stale_tasks %}
-                <div class="d-flex align-items-center p-2 mb-2 rounded-3" style="background: #f5f5f5;">
-                    <div class="flex-grow-1">
-                        <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small">{{ t.title }}</a>
+                <div class="d-flex align-items-center p-2 mb-2 rounded-3 hover-lift" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                    <div class="flex-grow-1 min-width-0">
+                        <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small d-block text-truncate">{{ t.title }}</a>
                         <div class="text-muted" style="font-size:0.75rem;">Due {{ t.due_date.strftime('%b %d') }} &middot; {{ t.project.name }}</div>
                     </div>
-                    <span class="badge ms-2" style="font-size:0.65rem; background:#e0e0e0; color:#616161;">Stale</span>
+                    <span class="badge" style="background:#e2e8f0; color:#475569;">Stale</span>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
             <div class="empty-state">
-                <i class="bi bi-clipboard-check fs-2" style="color:#b2ebf2;"></i>
-                <p class="mt-2 small">No stale tasks!</p>
+                <i class="bi bi-clipboard-check"></i>
+                <h5>Everything is moving!</h5>
+                <p class="small">No stale tasks right now.</p>
             </div>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Upcoming Deadlines Timeline -->
-<div class="card p-4 mb-4">
-    <h5 class="section-title mb-4"><i class="bi bi-calendar-week text-primary me-2"></i>Upcoming Deadlines</h5>
+<!-- Upcoming Deadlines -->
+<div class="card p-4 mb-4 animate-fade-up">
+    <h5 class="section-title mb-4"><i class="bi bi-calendar-week text-primary me-1"></i>Upcoming Deadlines</h5>
     {% if upcoming_deadlines %}
     <div class="d-flex overflow-auto pb-2" style="gap: 12px;">
         {% for t in upcoming_deadlines %}
-        <div class="flex-shrink-0 p-3 rounded-4" style="min-width: 200px; background: linear-gradient(135deg, #e1f5fe, #b3e5fc); border: 1px solid rgba(2,136,209,0.1);">
+        <div class="flex-shrink-0 p-3 rounded-3 card-hover" style="min-width: 220px; background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border: 1px solid rgba(14,165,233,0.1);">
             <div class="d-flex justify-content-between align-items-start mb-2">
-                <small class="fw-bold" style="color: #0277bd;">{{ t.due_date.strftime('%a, %b %d') }}</small>
+                <small class="fw-bold text-primary">{{ t.due_date.strftime('%a, %b %d') }}</small>
                 {% if t.priority == 'High' %}
-                <span class="badge badge-high" style="font-size:0.6rem;">High</span>
+                <span class="badge badge-high">High</span>
                 {% elif t.priority == 'Medium' %}
-                <span class="badge badge-medium" style="font-size:0.6rem;">Medium</span>
+                <span class="badge badge-warning" style="background:#fffbeb; color:#d97706;">Medium</span>
                 {% else %}
-                <span class="badge badge-low" style="font-size:0.6rem;">Low</span>
+                <span class="badge badge-safe" style="background:#f0fdf4; color:#16a34a;">Low</span>
                 {% endif %}
             </div>
-            <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small d-block mb-1" style="color: #01579b;">{{ t.title }}</a>
-            <small class="text-muted">{{ t.project.name }}</small>
+            <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small d-block mb-1 text-primary">{{ t.title }}</a>
+            <small class="text-muted d-block mb-2">{{ t.project.name }}</small>
             {% set days_left = (t.due_date - date.today()).days %}
             {% if days_left == 0 %}
-            <div class="mt-2 badge badge-critical" style="font-size:0.65rem;">Due Today</div>
+            <span class="badge badge-critical">Due Today</span>
             {% elif days_left == 1 %}
-            <div class="mt-2 badge badge-warning" style="font-size:0.65rem;">Tomorrow</div>
+            <span class="badge badge-warning">Tomorrow</span>
             {% else %}
-            <div class="mt-2 text-muted" style="font-size:0.75rem;">{{ days_left }} days left</div>
+            <span class="text-muted small">{{ days_left }} days remaining</span>
             {% endif %}
         </div>
         {% endfor %}
     </div>
     {% else %}
     <div class="empty-state">
-        <i class="bi bi-calendar-check fs-1" style="color:#b2ebf2;"></i>
-        <p class="mt-2">No upcoming deadlines in the next 7 days!</p>
+        <i class="bi bi-calendar-check"></i>
+        <h5>No upcoming deadlines</h5>
+        <p class="small">Nothing due in the next 7 days. Enjoy the calm!</p>
     </div>
     {% endif %}
 </div>
 
-<!-- Risky Tasks & Activity Feed -->
+<!-- Risky Tasks & Activity -->
 <div class="row g-3">
     <div class="col-lg-7">
-        <div class="card p-4">
-            <h5 class="section-title mb-4"><i class="bi bi-fire text-danger me-2"></i>Risky Tasks</h5>
+        <div class="card p-4 animate-fade-up">
+            <h5 class="section-title mb-4"><i class="bi bi-fire text-danger me-1"></i>Risky Tasks</h5>
             {% if risky_tasks %}
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead>
-                        <tr>
-                            <th>Task</th>
-                            <th>Due</th>
-                            <th>Risk</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for t in risky_tasks[:8] %}
-                        <tr>
-                            <td>
-                                <a href="{{ url_for('task_detail', task_id=t.id) }}" class="text-decoration-none fw-semibold">{{ t.title }}</a>
-                                <div class="small text-muted">{{ t.project.name }}</div>
-                            </td>
-                            <td class="small fw-medium">{{ t.due_date.strftime('%b %d') }}</td>
-                            <td>
-                                {% if t.risk_level() == 'critical' %}
-                                <span class="badge badge-critical"><i class="bi bi-exclamation-circle me-1"></i>Critical</span>
-                                {% else %}
-                                <span class="badge badge-warning"><i class="bi bi-clock me-1"></i>Warning</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr><th>Task</th><th>Due</th><th>Risk</th></tr></thead>
+                        <tbody>
+                            {% for t in risky_tasks[:8] %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('task_detail', task_id=t.id) }}" class="text-decoration-none fw-semibold">{{ t.title }}</a>
+                                    <div class="small text-muted">{{ t.project.name }}</div>
+                                </td>
+                                <td class="small fw-medium">{{ t.due_date.strftime('%b %d') }}</td>
+                                <td>
+                                    {% if t.risk_level() == 'critical' %}
+                                    <span class="badge badge-critical"><i class="bi bi-exclamation-circle me-1"></i>Critical</span>
+                                    {% else %}
+                                    <span class="badge badge-warning"><i class="bi bi-clock me-1"></i>Warning</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             {% else %}
-            <div class="empty-state py-4">
-                <i class="bi bi-shield-check fs-1" style="color:#b2ebf2;"></i>
-                <p class="mt-2">No risky tasks right now. Great job!</p>
+            <div class="empty-state">
+                <i class="bi bi-shield-check"></i>
+                <h5>All clear!</h5>
+                <p class="small">No risky tasks detected. Team is on track.</p>
             </div>
             {% endif %}
         </div>
     </div>
     <div class="col-lg-5">
-        <div class="card p-4">
-            <h5 class="section-title mb-4"><i class="bi bi-activity text-primary me-2"></i>Activity Feed</h5>
+        <div class="card p-4 animate-fade-up">
+            <h5 class="section-title mb-4"><i class="bi bi-activity text-primary me-1"></i>Activity Feed</h5>
             {% if activities %}
-            <div style="max-height: 380px; overflow-y: auto;">
+            <div class="timeline" style="max-height: 400px; overflow-y: auto;">
                 {% for act in activities %}
                 <div class="activity-item">
-                    <div class="d-flex align-items-start">
-                        <div class="activity-avatar me-3">{{ act.user.username[0]|upper }}</div>
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="activity-avatar">{{ act.user.username[0]|upper }}</div>
                         <div>
-                            <p class="mb-0 small" style="line-height:1.5;"><strong>{{ act.user.username }}</strong> {{ act.description }}</p>
+                            <p class="mb-0 small"><strong class="text-dark">{{ act.user.username }}</strong> <span class="text-secondary">{{ act.description }}</span></p>
                             <small class="text-muted">{{ act.created_at.strftime('%b %d, %H:%M') }}</small>
                         </div>
                     </div>
@@ -351,34 +298,35 @@
                 {% endfor %}
             </div>
             {% else %}
-            <div class="empty-state py-4">
-                <i class="bi bi-inbox fs-1" style="color:#b2ebf2;"></i>
-                <p class="mt-2">No activity yet.</p>
+            <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <h5>No activity yet</h5>
+                <p class="small">Actions will appear here as they happen.</p>
             </div>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Insights -->
-<div class="card p-4 mt-3">
-    <h5 class="section-title mb-4"><i class="bi bi-lightbulb-fill text-warning me-2"></i>Insights</h5>
+<!-- Daily Insights -->
+<div class="card p-4 mt-3 animate-fade-up">
+    <h5 class="section-title mb-4"><i class="bi bi-lightbulb-fill text-warning me-1"></i>Daily Insights</h5>
     <div class="row g-3">
         <div class="col-md-6">
-            <div class="d-flex align-items-center p-4 rounded-4" style="background: linear-gradient(135deg, #fff8e1, #ffecb3);">
-                <i class="bi bi-trophy-fill fs-2 me-4" style="color:#f9a825;"></i>
+            <div class="d-flex align-items-center p-3 rounded-3 hover-lift" style="background: linear-gradient(135deg, #fffbeb, #fefce8);">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #f59e0b, #d97706);"><i class="bi bi-trophy-fill"></i></div>
                 <div>
-                    <h6 class="fw-bold mb-1">You completed {{ insights.today_completed }} tasks today</h6>
-                    <p class="text-muted small mb-0">Keep up the momentum!</p>
+                    <div class="fw-semibold">{{ insights.today_completed }} tasks completed today</div>
+                    <div class="text-muted small">Keep up the momentum!</div>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="d-flex align-items-center p-4 rounded-4" style="background: linear-gradient(135deg, #ffebee, #ffcdd2);">
-                <i class="bi bi-calendar-x-fill fs-2 me-4 text-danger"></i>
+            <div class="d-flex align-items-center p-3 rounded-3 hover-lift" style="background: linear-gradient(135deg, #fef2f2, #fff5f5);">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #ef4444, #dc2626);"><i class="bi bi-calendar-x-fill"></i></div>
                 <div>
-                    <h6 class="fw-bold mb-1">{{ insights.overdue }} tasks are delayed</h6>
-                    <p class="text-muted small mb-0">Consider prioritizing these tasks.</p>
+                    <div class="fw-semibold">{{ insights.overdue }} tasks are delayed</div>
+                    <div class="text-muted small">Consider prioritizing these tasks.</div>
                 </div>
             </div>
         </div>

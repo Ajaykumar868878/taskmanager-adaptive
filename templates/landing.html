@@ -9,16 +9,17 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         :root {
-            --primary: #00acc1;
-            --primary-light: #4dd0e1;
-            --primary-dark: #0097a7;
-            --accent: #29b6f6;
-            --text: #263238;
-            --text-light: #78909c;
+            --primary: #0ea5e9;
+            --primary-light: #38bdf8;
+            --primary-dark: #0284c7;
+            --accent: #06b6d4;
+            --text: #0f172a;
+            --text-light: #64748b;
         }
         * { font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif; }
+        html { scroll-behavior: smooth; }
         body {
-            background: linear-gradient(135deg, #e0f7fa 0%, #e3f2fd 100%);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             background-attachment: fixed;
             color: var(--text);
             min-height: 100vh;
@@ -27,7 +28,7 @@
             background: rgba(255,255,255,0.85);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(0,0,0,0.04);
-            box-shadow: 0 2px 20px rgba(0,172,193,0.08);
+            box-shadow: 0 2px 20px rgba(14,165,233,0.08);
             padding: 0.75rem 0;
         }
         .navbar-brand {
@@ -47,7 +48,7 @@
         }
         .nav-link:hover {
             color: var(--primary-dark) !important;
-            background: rgba(0,172,193,0.08);
+            background: rgba(14,165,233,0.08);
         }
         .hero {
             padding: 80px 0 60px;
@@ -55,7 +56,7 @@
         .hero h1 {
             font-weight: 800;
             font-size: 2.8rem;
-            letter-spacing: -1px;
+            letter-spacing: -0.03em;
             line-height: 1.2;
             color: var(--text);
         }
@@ -71,12 +72,12 @@
             border-radius: 14px;
             font-weight: 600;
             padding: 0.75rem 2rem;
-            box-shadow: 0 4px 16px rgba(0,172,193,0.3);
+            box-shadow: 0 4px 16px rgba(14,165,233,0.3);
             transition: all 0.2s ease;
         }
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0,172,193,0.4);
+            box-shadow: 0 6px 20px rgba(14,165,233,0.4);
         }
         .btn-outline-primary {
             border: 2px solid var(--primary);
@@ -99,7 +100,7 @@
         }
         .feature-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0,172,193,0.12);
+            box-shadow: 0 12px 40px rgba(14,165,233,0.12);
         }
         .feature-icon {
             width: 56px;
