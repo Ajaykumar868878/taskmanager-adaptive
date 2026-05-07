@@ -346,13 +346,12 @@ def settings():
     user = User.query.get(session['user_id'])
     if request.method == 'POST':
         action = request.form.get('action')
-        if action == 'update_profile':
+        if action == 'profile':
             email = request.form.get('email')
-            if email:
-                user.email = email
-                db.session.commit()
-                flash('Profile updated successfully.', 'success')
-        elif action == 'change_password':
+            user.email = email
+            db.session.commit()
+            flash('Profile updated successfully.', 'success')
+        elif action == 'password':
             current_password = request.form.get('current_password')
             new_password = request.form.get('new_password')
             confirm_password = request.form.get('confirm_password')
@@ -360,12 +359,10 @@ def settings():
                 flash('Current password is incorrect.', 'error')
             elif new_password != confirm_password:
                 flash('New passwords do not match.', 'error')
-            elif len(new_password) < 4:
-                flash('Password must be at least 4 characters.', 'error')
             else:
                 user.password = bcrypt.generate_password_hash(new_password).decode('utf-8')
                 db.session.commit()
-                flash('Password changed successfully.', 'success')
+                flash('Password updated successfully.', 'success')
         return redirect(url_for('settings'))
     return render_template('settings.html', user=user)
 
@@ -672,7 +669,8 @@ def delete_task(task_id):
 def task_detail(task_id):
     task = Task.query.get_or_404(task_id)
     histories = TaskHistory.query.filter_by(task_id=task_id).order_by(TaskHistory.created_at.desc()).all()
-    return render_template('task_detail.html', task=task, histories=histories)
+    user = User.query.get(session['user_id'])
+    return render_template('task_detail.html', task=task, histories=histories, user=user)
 
 # ============== CHAT ROUTES ==============
 
@@ -796,6 +794,24 @@ def create_group():
     db.session.commit()
     flash(f"Group '{name}' created successfully.", 'success')
     return redirect(url_for('chat', type='group', id=group.id))
+
+@app.route('/chat/group/<int:group_id>/members', methods=['POST'])
+@admin_required
+def manage_group_members(group_id):
+    group = ChatGroup.query.get_or_404(group_id)
+    action = request.form.get('action')
+    user_id = int(request.form.get('user_id'))
+    user = User.query.get(user_id)
+
+    if action == 'add' and user not in group.members:
+        group.members.append(user)
+        flash(f'{user.username} added to group.', 'success')
+    elif action == 'remove' and user in group.members:
+        group.members.remove(user)
+        flash(f'{user.username} removed from group.', 'success')
+
+    db.session.commit()
+    return redirect(url_for('chat', type='group', id=group_id))
 
 # ============== INITIAL SETUP ==============
 

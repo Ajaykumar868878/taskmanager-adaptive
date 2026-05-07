@@ -90,13 +90,20 @@
                     <small class="text-muted">{{ selected_user.role|capitalize }}</small>
                 </div>
                 {% elif chat_type == 'group' and selected_group %}
-                <div class="stat-icon me-3" style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#fff3e0,#ffe0b2);">
-                    <i class="bi bi-people-fill" style="color:#ef6c00;"></i>
+                <div class="d-flex align-items-center flex-grow-1">
+                    <div class="stat-icon me-3" style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#fff3e0,#ffe0b2);">
+                        <i class="bi bi-people-fill" style="color:#ef6c00;"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">{{ selected_group.name }}</h5>
+                        <small class="text-muted">{{ selected_group.members|length }} members</small>
+                    </div>
                 </div>
-                <div>
-                    <h5 class="fw-bold mb-0">{{ selected_group.name }}</h5>
-                    <small class="text-muted">{{ selected_group.members|length }} members</small>
-                </div>
+                {% if user.role == 'admin' %}
+                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#groupMembersModal">
+                    <i class="bi bi-gear me-1"></i> Manage
+                </button>
+                {% endif %}
                 {% elif chat_type == 'broadcast' %}
                 <div class="stat-icon me-3" style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#ffcdd2,#ef9a9a);">
                     <i class="bi bi-megaphone-fill text-danger"></i>
@@ -170,6 +177,51 @@
         </div>
     </div>
 </div>
+
+<!-- Group Members Management Modal -->
+{% if user.role == 'admin' and selected_group %}
+<div class="modal fade" id="groupMembersModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Manage Members - {{ selected_group.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6 class="fw-bold mb-2">Current Members</h6>
+                <ul class="list-group mb-3">
+                    {% for member in selected_group.members %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-person me-2"></i>{{ member.username }}</span>
+                        <form method="POST" action="{{ url_for('manage_group_members', group_id=selected_group.id) }}" class="d-inline">
+                            <input type="hidden" name="action" value="remove">
+                            <input type="hidden" name="user_id" value="{{ member.id }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="list-group-item text-muted">No members yet</li>
+                    {% endfor %}
+                </ul>
+                <h6 class="fw-bold mb-2">Add Member</h6>
+                <form method="POST" action="{{ url_for('manage_group_members', group_id=selected_group.id) }}">
+                    <input type="hidden" name="action" value="add">
+                    <div class="input-group">
+                        <select name="user_id" class="form-select">
+                            {% for u in users %}
+                            {% if u not in selected_group.members %}
+                            <option value="{{ u.id }}">{{ u.username }} ({{ u.role }})</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <!-- Create Group Modal -->
 {% if user.role == 'admin' %}

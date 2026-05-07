@@ -117,6 +117,14 @@
                         <form method="POST" action="{{ url_for('delete_task', task_id=task.id) }}" class="d-inline" onsubmit="return confirm('Delete this task?');">
                             <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
                         </form>
+                        {% elif task.assigned_to == user.id %}
+                        <form method="POST" action="{{ url_for('update_task', task_id=task.id) }}" class="d-inline">
+                            <select name="status" class="form-select form-select-sm d-inline w-auto" style="width:auto;display:inline-block;" onchange="this.form.submit()">
+                                <option value="Todo" {{ 'selected' if task.status == 'Todo' else '' }}>Todo</option>
+                                <option value="In Progress" {{ 'selected' if task.status == 'In Progress' else '' }}>In Progress</option>
+                                <option value="Done" {{ 'selected' if task.status == 'Done' else '' }}>Done</option>
+                            </select>
+                        </form>
                         {% else %}
                         <span class="text-muted small">View only</span>
                         {% endif %}

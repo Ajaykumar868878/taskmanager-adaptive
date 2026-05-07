@@ -61,7 +61,7 @@
                     <h6 class="fw-bold mb-2">Current Members</h6>
                     <ul class="list-group mb-3">
                         {% for member in project.members %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center" style="background: var(--card); color: var(--text); border-color: var(--card-border);">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span><i class="bi bi-person me-2"></i>{{ member.username }}</span>
                             {% if user.role == 'admin' or project.owner_id == user.id %}
                             <form method="POST" action="{{ url_for('manage_members', project_id=project.id) }}" class="d-inline">
