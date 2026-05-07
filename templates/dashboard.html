@@ -51,7 +51,7 @@
     ] %}
     {% for label, value, icon, color in stats %}
     <div class="col-sm-6 col-xl-3">
-        <div class="stat-card animate-fade-up" style="animation-delay: {{ loop.index * 0.1 }}s;">
+        <div class="stat-card animate-fade-up delay-{{ loop.index }}">
             <div class="d-flex align-items-center gap-3">
                 <div class="circular-progress">
                     <svg width="72" height="72" viewBox="0 0 72 72">
@@ -81,11 +81,11 @@
             {% if total_risk > 0 %}
             <div class="mb-4">
                 <div class="d-flex justify-content-between small fw-medium mb-1"><span class="text-secondary">Critical</span><span>{{ risk_counts.critical }}</span></div>
-                <div class="progress mb-3"><div class="progress-bar bg-danger" style="width: {{ (risk_counts.critical / total_risk * 100) }}%"></div></div>
+                <div class="progress mb-3"><div class="progress-bar bg-danger" data-width="{{ (risk_counts.critical / total_risk * 100) }}"></div></div>
                 <div class="d-flex justify-content-between small fw-medium mb-1"><span class="text-secondary">Warning</span><span>{{ risk_counts.warning }}</span></div>
-                <div class="progress mb-3"><div class="progress-bar" style="width: {{ (risk_counts.warning / total_risk * 100) }}%; background: #f59e0b;"></div></div>
+                <div class="progress mb-3"><div class="progress-bar bg-warning-bar" data-width="{{ (risk_counts.warning / total_risk * 100) }}"></div></div>
                 <div class="d-flex justify-content-between small fw-medium mb-1"><span class="text-secondary">Safe</span><span>{{ risk_counts.safe }}</span></div>
-                <div class="progress"><div class="progress-bar bg-success" style="width: {{ (risk_counts.safe / total_risk * 100) }}%"></div></div>
+                <div class="progress"><div class="progress-bar bg-success" data-width="{{ (risk_counts.safe / total_risk * 100) }}"></div></div>
             </div>
             {% endif %}
             <div class="row g-2 text-center">

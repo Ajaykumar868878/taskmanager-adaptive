@@ -19,7 +19,7 @@
     {% set done_tasks = project.tasks|selectattr('status', 'equalto', 'Done')|list|length %}
     {% set completion = (done_tasks / total_tasks * 100) if total_tasks > 0 else 0 %}
     <div class="col-md-6 col-lg-4">
-        <div class="card card-hover p-4 h-100 animate-fade-up" style="animation-delay: {{ loop.index * 0.08 }}s;">
+        <div class="card card-hover p-4 h-100 animate-fade-up delay-{{ loop.index }}">
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div class="d-flex align-items-center gap-3">
                     <div class="stat-icon flex-shrink-0" style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe); color: #0ea5e9;">
@@ -47,7 +47,7 @@
                     <span class="text-primary">{{ completion|int }}%</span>
                 </div>
                 <div class="progress">
-                    <div class="progress-bar" style="width: {{ completion }}%; background: linear-gradient(90deg, #0ea5e9, #06b6d4);"></div>
+                    <div class="progress-bar bg-gradient-primary" data-width="{{ completion }}"></div>
                 </div>
             </div>
             {% endif %}
