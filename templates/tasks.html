@@ -283,3 +283,26 @@
 </div>
 {% endfor %}
 {% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    function initNewTaskModal() {
+        var modalEl = document.getElementById('createTaskModal');
+        var btn = document.querySelector('[data-bs-target="#createTaskModal"]');
+        if (!modalEl || !btn) return;
+        var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            modal.show();
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initNewTaskModal);
+    } else {
+        initNewTaskModal();
+    }
+})();
+</script>
+{% endblock %}
