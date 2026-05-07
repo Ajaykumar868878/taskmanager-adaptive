@@ -287,47 +287,15 @@
 {% block extra_js %}
 <script>
 (function() {
-    function initNewTaskModal() {
-        var modalEl = document.getElementById('createTaskModal');
-        var btn = document.getElementById('newTaskBtn');
-        if (!modalEl || !btn) return;
-        var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            modal.show();
-        });
-    }
-    // Also ensure Create Task button explicitly submits the form
-    function initCreateTaskForm() {
-        var form = document.querySelector('#createTaskModal form');
-        var submitBtn = document.querySelector('#createTaskModal button[type="submit"]');
-        var modalEl = document.getElementById('createTaskModal');
-        if (!form || !submitBtn || !modalEl) return;
-        var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-        submitBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (form.checkValidity()) {
-                modal.hide();
-                setTimeout(function() {
-                    form.submit();
-                }, 50);
-            } else {
-                form.reportValidity();
-            }
-        });
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            initNewTaskModal();
-            initCreateTaskForm();
-        });
-    } else {
-        initNewTaskModal();
-        initCreateTaskForm();
-    }
+    // Only handle modal opening - form submits natively
+    var modalEl = document.getElementById('createTaskModal');
+    var btn = document.getElementById('newTaskBtn');
+    if (!modalEl || !btn) return;
+    var modal = new bootstrap.Modal(modalEl);
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        modal.show();
+    });
 })();
 </script>
 {% endblock %}
