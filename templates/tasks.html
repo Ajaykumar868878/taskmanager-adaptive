@@ -275,6 +275,25 @@
     </div>
 </div>
 {% endfor %}
+
+<style>
+/* FORCE MODAL VISIBILITY */
+.modal-backdrop { z-index: 1040 !important; }
+.modal { z-index: 1050 !important; }
+.modal-content { 
+    background-color: #ffffff !important; 
+    color: #000000 !important;
+    border: 1px solid rgba(0,0,0,0.2) !important;
+}
+.modal-header .modal-title { color: #000000 !important; font-weight: 700 !important; }
+.modal-body label { color: #333333 !important; font-weight: 600 !important; }
+.modal-body .form-control, .modal-body .form-select {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #ced4da !important;
+}
+</style>
+
 {% endblock %}
 
 {% block extra_js %}
