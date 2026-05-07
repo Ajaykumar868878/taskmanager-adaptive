@@ -7,7 +7,7 @@
         <p class="mb-0">Manage and track all tasks</p>
     </div>
     {% if user.role == 'admin' %}
-    <button class="btn btn-primary" id="newTaskBtn">
+    <button class="btn btn-primary shadow-sm px-4" data-bs-toggle="modal" data-bs-target="#createTaskModal">
         <i class="bi bi-plus-lg me-1"></i> New Task
     </button>
     {% endif %}
@@ -146,66 +146,59 @@
 </div>
 
 <!-- Create Task Modal -->
-<div class="modal fade" id="createTaskModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Create New Task</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="createTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-white border-bottom-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark">Create New Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="{{ url_for('create_task') }}" id="createTaskForm">
-                <div class="modal-body">
+                <div class="modal-body px-4 pb-4">
                     <div class="row g-3">
                         <div class="col-md-8">
-                            <label class="form-label fw-semibold">Title</label>
-                            <input type="text" name="title" class="form-control" required>
+                            <label class="form-label fw-semibold text-dark">Title</label>
+                            <input type="text" name="title" class="form-control border-2" placeholder="Task title" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Project</label>
-                            <select name="project_id" class="form-select" required>
+                            <label class="form-label fw-semibold text-dark">Project</label>
+                            <select name="project_id" class="form-select border-2" required>
+                                <option value="" disabled selected>Select Project</option>
                                 {% for p in projects %}
                                 <option value="{{ p.id }}">{{ p.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-semibold">Description</label>
-                            <textarea name="description" class="form-control" rows="2"></textarea>
+                            <label class="form-label fw-semibold text-dark">Description</label>
+                            <textarea name="description" class="form-control border-2" rows="3" placeholder="Task details..."></textarea>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Priority</label>
-                            <select name="priority" class="form-select">
+                            <label class="form-label fw-semibold text-dark">Priority</label>
+                            <select name="priority" class="form-select border-2">
                                 <option value="Low">Low</option>
                                 <option value="Medium" selected>Medium</option>
                                 <option value="High">High</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Due Date</label>
-                            <input type="date" name="due_date" class="form-control" required>
+                            <label class="form-label fw-semibold text-dark">Due Date</label>
+                            <input type="date" name="due_date" class="form-control border-2" required>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Assigned To</label>
-                            <select name="assigned_to" class="form-select" required>
+                            <label class="form-label fw-semibold text-dark">Assigned To</label>
+                            <select name="assigned_to" class="form-select border-2" required>
+                                <option value="" disabled selected>Select User</option>
                                 {% for u in users %}
                                 <option value="{{ u.id }}">{{ u.username }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-md-8">
-                            <label class="form-label fw-semibold">Depends On (Parent Task)</label>
-                            <select name="parent_task_id" class="form-select">
-                                <option value="">None</option>
-                                {% for t in all_tasks %}
-                                <option value="{{ t.id }}">{{ t.title }} ({{ t.project.name }})</option>
-                                {% endfor %}
-                            </select>
-                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Create Task</button>
+                <div class="modal-footer border-top-0 px-4 pb-4">
+                    <button type="button" class="btn btn-light px-4 fw-semibold" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4 fw-semibold shadow-sm">Create Task</button>
                 </div>
             </form>
         </div>
@@ -285,30 +278,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const newTaskBtn = document.getElementById('newTaskBtn');
-    const modalEl = document.getElementById('createTaskModal');
-    
-    if (newTaskBtn && modalEl) {
-        const modal = new bootstrap.Modal(modalEl, {
-            backdrop: true,
-            keyboard: true
-        });
-        
-        newTaskBtn.addEventListener('click', function() {
-            modal.show();
-        });
-        
-        // Ensure form submission closes modal properly
-        const form = document.getElementById('createTaskForm');
-        if (form) {
-            form.addEventListener('submit', function() {
-                modal.hide();
-            });
-        }
-    }
-});
-</script>
 {% endblock %}
 
