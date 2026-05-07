@@ -211,17 +211,6 @@
         </div>
     </div>
 </div>
-<script>
-(function(){
-    var form = document.getElementById('createTaskForm');
-    if(!form) return;
-    form.addEventListener('submit', function(){
-        var modalEl = document.getElementById('createTaskModal');
-        var modal = bootstrap.Modal.getInstance(modalEl);
-        if(modal) modal.hide();
-    });
-})();
-</script>
 
 <!-- Edit Task Modals -->
 {% for task in tasks %}
@@ -293,5 +282,25 @@
     </div>
 </div>
 {% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const newTaskBtn = document.getElementById('newTaskBtn');
+    const modalEl = document.getElementById('createTaskModal');
+    
+    if (newTaskBtn && modalEl) {
+        // Initialize modal instance
+        const modal = new bootstrap.Modal(modalEl);
+        
+        // Force open on click
+        newTaskBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            modal.show();
+        });
+    }
+});
+</script>
 {% endblock %}
 
