@@ -219,7 +219,9 @@ def get_task_risk_counts(tasks):
 def get_insights(user_id=None):
     query = Task.query
     if user_id:
-        query = query.filter((Task.assigned_to == user_id) | (Task.created_by == user_id))
+        user = User.query.get(user_id)
+        if user and user.role != 'admin':
+            query = query.filter((Task.assigned_to == user_id) | (Task.created_by == user_id))
     tasks = query.all()
 
     total = len(tasks)
@@ -271,7 +273,10 @@ def ai_assistant_response(user_message, user_id):
     """Simple rule-based AI assistant for task management."""
     msg = user_message.lower()
     user = User.query.get(user_id)
-    tasks = Task.query.filter((Task.assigned_to == user_id) | (Task.created_by == user_id)).all()
+    if user.role == 'admin':
+        tasks = Task.query.all()
+    else:
+        tasks = Task.query.filter((Task.assigned_to == user_id) | (Task.created_by == user_id)).all()
 
     overdue_count = sum(1 for t in tasks if t.risk_level() == 'critical' and t.status != 'Done')
     high_count = sum(1 for t in tasks if t.priority == 'High' and t.status != 'Done')
@@ -415,10 +420,13 @@ def dashboard():
             Task.status != 'Done'
         ).all()
     else:
-        tasks = Task.query.join(Project).filter(
-            (Project.owner_id == session['user_id']) |
-            (Project.members.any(id=session['user_id']))
-        ).all()
+        if user.role == 'admin':
+            tasks = Task.query.all()
+        else:
+            tasks = Task.query.join(Project).filter(
+                (Project.owner_id == session['user_id']) |
+                (Project.members.any(id=session['user_id']))
+            ).all()
 
     risk_counts = get_task_risk_counts(tasks)
     insights = get_insights(session['user_id'])
@@ -565,10 +573,13 @@ def tasks():
     priority_filter = request.args.get('priority', '')
     user_filter = request.args.get('user_id', '')
 
-    query = Task.query.join(Project).filter(
-        (Project.owner_id == session['user_id']) |
-        (Project.members.any(id=session['user_id']))
-    )
+    if user.role == 'admin':
+        query = Task.query
+    else:
+        query = Task.query.join(Project).filter(
+            (Project.owner_id == session['user_id']) |
+            (Project.members.any(id=session['user_id']))
+        )
 
     if project_id:
         query = query.filter(Task.project_id == project_id)
@@ -588,10 +599,13 @@ def tasks():
         Task.due_date
     ).all()
 
-    projects_list = Project.query.filter(
-        (Project.owner_id == session['user_id']) |
-        (Project.members.any(id=session['user_id']))
-    ).all()
+    if user.role == 'admin':
+        projects_list = Project.query.all()
+    else:
+        projects_list = Project.query.filter(
+            (Project.owner_id == session['user_id']) |
+            (Project.members.any(id=session['user_id']))
+        ).all()
 
     users = User.query.all()
     all_tasks_for_dropdown = Task.query.all()
