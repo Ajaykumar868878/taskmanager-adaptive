@@ -1,14 +1,21 @@
 {% extends "base.html" %}
 {% block title %}Dashboard - Smart Task{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-    <div class="page-header mb-0">
-        <h2 class="mb-1">Dashboard</h2>
-        <p class="mb-0">Welcome back, {{ user.username }}! Here's your overview.</p>
+<!-- Hero Statement -->
+<div class="p-4 mb-4 rounded-4" style="background: linear-gradient(135deg, #e0f7fa, #e3f2fd); border: 1px solid rgba(0,172,193,0.15);">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="fw-bold mb-2" style="font-size: 1.6rem; color: var(--primary-dark);">Welcome back, {{ user.username }}!</h1>
+            <p class="mb-0" style="color: #546e7a; font-size: 0.95rem;">
+                <strong>Smart Task</strong> &mdash; An adaptive productivity platform that identifies risks, improves collaboration, and helps teams focus on high-impact work.
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a href="{{ url_for('dashboard', focus='on' if not focus_mode else '') }}" class="focus-toggle {{ 'active' if focus_mode else '' }} text-decoration-none">
+                <i class="bi bi-eye-fill me-1"></i> Focus Mode {{ 'ON' if focus_mode else 'OFF' }}
+            </a>
+        </div>
     </div>
-    <a href="{{ url_for('dashboard', focus='on' if not focus_mode else '') }}" class="focus-toggle {{ 'active' if focus_mode else '' }} text-decoration-none">
-        <i class="bi bi-eye-fill me-1"></i> Focus Mode {{ 'ON' if focus_mode else 'OFF' }}
-    </a>
 </div>
 
 {% if focus_mode %}
@@ -17,17 +24,30 @@
 </div>
 {% endif %}
 
+<!-- AI Insight Banner -->
+<div class="card p-4 mb-4" style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); border: none;">
+    <div class="d-flex align-items-center">
+        <div class="stat-icon me-3" style="background: linear-gradient(135deg, #ce93d8, #ab47bc); color: white; width: 52px; height: 52px;">
+            <i class="bi bi-robot fs-4"></i>
+        </div>
+        <div>
+            <h6 class="fw-bold mb-1" style="color: #4a148c;"><i class="bi bi-stars me-1"></i>AI Insight</h6>
+            <p class="mb-0" style="color: #6a1b9a;">{{ ai_message }}</p>
+        </div>
+    </div>
+</div>
+
 <!-- Stats Cards -->
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card card-hover">
             <div class="d-flex align-items-center">
                 <div class="stat-icon me-3" style="background: linear-gradient(135deg, #e1f5fe, #b3e5fc); color: #0288d1;">
-                    <i class="bi bi-clipboard-data"></i>
+                    <i class="bi bi-graph-up-arrow"></i>
                 </div>
                 <div>
-                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Total Tasks</h6>
-                    <h3 class="fw-bold mb-0">{{ insights.total }}</h3>
+                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Team Productivity</h6>
+                    <h3 class="fw-bold mb-0">{{ insights.productivity_pct }}%</h3>
                 </div>
             </div>
         </div>
@@ -39,8 +59,8 @@
                     <i class="bi bi-check-circle-fill"></i>
                 </div>
                 <div>
-                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Completed</h6>
-                    <h3 class="fw-bold mb-0">{{ insights.completed }}</h3>
+                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Completion Rate</h6>
+                    <h3 class="fw-bold mb-0">{{ insights.completion_rate }}%</h3>
                 </div>
             </div>
         </div>
@@ -52,8 +72,8 @@
                     <i class="bi bi-exclamation-triangle-fill"></i>
                 </div>
                 <div>
-                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Overdue</h6>
-                    <h3 class="fw-bold mb-0">{{ insights.overdue }}</h3>
+                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Overdue Rate</h6>
+                    <h3 class="fw-bold mb-0">{{ insights.overdue_rate }}%</h3>
                 </div>
             </div>
         </div>
@@ -62,11 +82,11 @@
         <div class="stat-card card-hover">
             <div class="d-flex align-items-center">
                 <div class="stat-icon me-3" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #ef6c00;">
-                    <i class="bi bi-lightning-fill"></i>
+                    <i class="bi bi-clock-history"></i>
                 </div>
                 <div>
-                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">High Priority</h6>
-                    <h3 class="fw-bold mb-0">{{ insights.high_priority }}</h3>
+                    <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Avg Completion Time</h6>
+                    <h3 class="fw-bold mb-0">{{ insights.avg_completion_days }}d</h3>
                 </div>
             </div>
         </div>
@@ -157,6 +177,117 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Special Sections: Overdue, Blocked, Unassigned -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-4">
+        <div class="card p-4 h-100">
+            <h5 class="section-title mb-3"><i class="bi bi-calendar-x text-danger me-2"></i>Overdue Tasks</h5>
+            {% if overdue_tasks %}
+            <div style="max-height: 260px; overflow-y: auto;">
+                {% for t in overdue_tasks %}
+                <div class="d-flex align-items-center p-2 mb-2 rounded-3" style="background: #ffebee;">
+                    <div class="flex-grow-1">
+                        <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small">{{ t.title }}</a>
+                        <div class="text-muted" style="font-size:0.75rem;">{{ t.due_date.strftime('%b %d') }} &middot; {{ t.project.name }}</div>
+                    </div>
+                    <span class="badge badge-critical ms-2" style="font-size:0.65rem;">Critical</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-check-circle fs-2" style="color:#b2ebf2;"></i>
+                <p class="mt-2 small">No overdue tasks!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card p-4 h-100">
+            <h5 class="section-title mb-3"><i class="bi bi-lock-fill text-warning me-2"></i>Blocked Tasks</h5>
+            {% if blocked_tasks %}
+            <div style="max-height: 260px; overflow-y: auto;">
+                {% for t in blocked_tasks %}
+                <div class="d-flex align-items-center p-2 mb-2 rounded-3" style="background: #fff3e0;">
+                    <div class="flex-grow-1">
+                        <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small">{{ t.title }}</a>
+                        <div class="text-muted" style="font-size:0.75rem;">Blocked by: {{ t.parent.title }}</div>
+                    </div>
+                    <span class="badge badge-warning ms-2" style="font-size:0.65rem;">Blocked</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-unlock fs-2" style="color:#b2ebf2;"></i>
+                <p class="mt-2 small">No blocked tasks!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card p-4 h-100">
+            <h5 class="section-title mb-3"><i class="bi bi-inbox text-muted me-2"></i>Stale Tasks</h5>
+            {% if stale_tasks %}
+            <div style="max-height: 260px; overflow-y: auto;">
+                {% for t in stale_tasks %}
+                <div class="d-flex align-items-center p-2 mb-2 rounded-3" style="background: #f5f5f5;">
+                    <div class="flex-grow-1">
+                        <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small">{{ t.title }}</a>
+                        <div class="text-muted" style="font-size:0.75rem;">Due {{ t.due_date.strftime('%b %d') }} &middot; {{ t.project.name }}</div>
+                    </div>
+                    <span class="badge ms-2" style="font-size:0.65rem; background:#e0e0e0; color:#616161;">Stale</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="bi bi-clipboard-check fs-2" style="color:#b2ebf2;"></i>
+                <p class="mt-2 small">No stale tasks!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Deadlines Timeline -->
+<div class="card p-4 mb-4">
+    <h5 class="section-title mb-4"><i class="bi bi-calendar-week text-primary me-2"></i>Upcoming Deadlines</h5>
+    {% if upcoming_deadlines %}
+    <div class="d-flex overflow-auto pb-2" style="gap: 12px;">
+        {% for t in upcoming_deadlines %}
+        <div class="flex-shrink-0 p-3 rounded-4" style="min-width: 200px; background: linear-gradient(135deg, #e1f5fe, #b3e5fc); border: 1px solid rgba(2,136,209,0.1);">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <small class="fw-bold" style="color: #0277bd;">{{ t.due_date.strftime('%a, %b %d') }}</small>
+                {% if t.priority == 'High' %}
+                <span class="badge badge-high" style="font-size:0.6rem;">High</span>
+                {% elif t.priority == 'Medium' %}
+                <span class="badge badge-medium" style="font-size:0.6rem;">Medium</span>
+                {% else %}
+                <span class="badge badge-low" style="font-size:0.6rem;">Low</span>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('task_detail', task_id=t.id) }}" class="fw-semibold text-decoration-none small d-block mb-1" style="color: #01579b;">{{ t.title }}</a>
+            <small class="text-muted">{{ t.project.name }}</small>
+            {% set days_left = (t.due_date - date.today()).days %}
+            {% if days_left == 0 %}
+            <div class="mt-2 badge badge-critical" style="font-size:0.65rem;">Due Today</div>
+            {% elif days_left == 1 %}
+            <div class="mt-2 badge badge-warning" style="font-size:0.65rem;">Tomorrow</div>
+            {% else %}
+            <div class="mt-2 text-muted" style="font-size:0.75rem;">{{ days_left }} days left</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-calendar-check fs-1" style="color:#b2ebf2;"></i>
+        <p class="mt-2">No upcoming deadlines in the next 7 days!</p>
+    </div>
+    {% endif %}
 </div>
 
 <!-- Risky Tasks & Activity Feed -->

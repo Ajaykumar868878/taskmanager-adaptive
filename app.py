@@ -58,10 +58,12 @@ class Task(db.Model):
     assigned_to = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    parent_task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     histories = db.relationship('TaskHistory', backref='task', lazy=True, cascade='all, delete-orphan', order_by='TaskHistory.created_at.desc()')
+    child_tasks = db.relationship('Task', backref=db.backref('parent', remote_side=[id]), lazy=True)
 
     def risk_level(self):
         if self.status == 'Done':
@@ -75,6 +77,11 @@ class Task(db.Model):
 
     def risk_badge(self):
         return self.risk_level()
+
+    def is_blocked(self):
+        if self.parent and self.parent.status != 'Done':
+            return True
+        return False
 
 class TaskHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -190,6 +197,25 @@ def get_insights(user_id=None):
     today = date.today()
     today_completed = sum(1 for t in tasks if t.status == 'Done' and t.updated_at and t.updated_at.date() == today)
 
+    # New metrics
+    productivity_pct = round((completed / total * 100), 1) if total > 0 else 0
+    completion_rate = round((completed / total * 100), 1) if total > 0 else 0
+    overdue_rate = round((overdue / total * 100), 1) if total > 0 else 0
+
+    # Avg completion time (days from created to updated for done tasks)
+    done_tasks = [t for t in tasks if t.status == 'Done' and t.updated_at]
+    avg_completion_days = 0
+    if done_tasks:
+        total_days = sum((t.updated_at.date() - t.created_at.date()).days for t in done_tasks)
+        avg_completion_days = round(total_days / len(done_tasks), 1)
+
+    # Blocked tasks
+    blocked_count = sum(1 for t in tasks if t.is_blocked() and t.status != 'Done')
+
+    # Unassigned tasks (no assignee or assignee is 0 - but our model requires assigned_to)
+    # We'll consider tasks with status 'Todo' and created long ago as potentially stale
+    stale_tasks = [t for t in tasks if t.status == 'Todo' and (today - t.due_date).days > 7]
+
     return {
         'total': total,
         'completed': completed,
@@ -197,7 +223,13 @@ def get_insights(user_id=None):
         'high_priority': high_priority,
         'medium_priority': medium_priority,
         'low_priority': low_priority,
-        'today_completed': today_completed
+        'today_completed': today_completed,
+        'productivity_pct': productivity_pct,
+        'completion_rate': completion_rate,
+        'overdue_rate': overdue_rate,
+        'avg_completion_days': avg_completion_days,
+        'blocked_count': blocked_count,
+        'stale_count': len(stale_tasks)
     }
 
 def ai_assistant_response(user_message, user_id):
@@ -344,6 +376,31 @@ def dashboard():
     risky_tasks = [t for t in tasks if t.risk_level() != 'safe' and t.status != 'Done']
     risky_tasks.sort(key=lambda x: (x.due_date or date.max))
 
+    # Special sections
+    overdue_tasks = [t for t in tasks if t.risk_level() == 'critical' and t.status != 'Done']
+    blocked_tasks = [t for t in tasks if t.is_blocked() and t.status != 'Done']
+    stale_tasks = [t for t in tasks if t.status == 'Todo' and (date.today() - t.due_date).days > 7]
+
+    # Upcoming deadlines (next 7 days, not done)
+    upcoming_deadlines = [t for t in tasks if t.status != 'Done' and 0 <= (t.due_date - date.today()).days <= 7]
+    upcoming_deadlines.sort(key=lambda x: x.due_date)
+
+    # AI-generated style message
+    high_pending = insights['high_priority']
+    overdue_count = insights['overdue']
+    blocked_count = insights['blocked_count']
+    ai_parts = []
+    if high_pending > 0:
+        ai_parts.append(f"{high_pending} high-priority task{'s' if high_pending > 1 else ''}")
+    if overdue_count > 0:
+        ai_parts.append(f"{overdue_count} overdue task{'s' if overdue_count > 1 else ''} needing attention")
+    if blocked_count > 0:
+        ai_parts.append(f"{blocked_count} blocked task{'s' if blocked_count > 1 else ''}")
+    if ai_parts:
+        ai_message = "You have " + ", ".join(ai_parts) + " today."
+    else:
+        ai_message = "Great job! No urgent items on your radar today. Stay productive!"
+
     return render_template('dashboard.html',
                            user=user,
                            tasks=tasks,
@@ -351,7 +408,12 @@ def dashboard():
                            insights=insights,
                            activities=activities,
                            risky_tasks=risky_tasks,
-                           focus_mode=focus_mode)
+                           focus_mode=focus_mode,
+                           overdue_tasks=overdue_tasks,
+                           blocked_tasks=blocked_tasks,
+                           stale_tasks=stale_tasks,
+                           upcoming_deadlines=upcoming_deadlines,
+                           ai_message=ai_message)
 
 # ============== PROJECTS ==============
 
@@ -470,10 +532,12 @@ def tasks():
     ).all()
 
     users = User.query.all()
+    all_tasks_for_dropdown = Task.query.all()
     return render_template('tasks.html',
                            tasks=all_tasks,
                            projects=projects_list,
                            users=users,
+                           all_tasks=all_tasks_for_dropdown,
                            user=user,
                            selected_project=project_id,
                            selected_status=status_filter,
@@ -489,6 +553,8 @@ def create_task():
     due_date = datetime.strptime(request.form.get('due_date'), '%Y-%m-%d').date()
     assigned_to = int(request.form.get('assigned_to'))
     project_id = int(request.form.get('project_id'))
+    parent_id = request.form.get('parent_task_id')
+    parent_task_id = int(parent_id) if parent_id else None
 
     task = Task(
         title=title,
@@ -498,6 +564,7 @@ def create_task():
         assigned_to=assigned_to,
         created_by=session['user_id'],
         project_id=project_id,
+        parent_task_id=parent_task_id,
         status='Todo'
     )
     db.session.add(task)
@@ -544,6 +611,8 @@ def update_task(task_id):
     task.priority = request.form.get('priority')
     task.due_date = datetime.strptime(request.form.get('due_date'), '%Y-%m-%d').date()
     task.assigned_to = int(request.form.get('assigned_to'))
+    parent_id = request.form.get('parent_task_id')
+    task.parent_task_id = int(parent_id) if parent_id else None
     new_status = request.form.get('status')
 
     if new_status != old_status:

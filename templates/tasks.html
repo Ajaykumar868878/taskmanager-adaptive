@@ -182,6 +182,15 @@
                                 {% endfor %}
                             </select>
                         </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Depends On (Parent Task)</label>
+                            <select name="parent_task_id" class="form-select">
+                                <option value="">None</option>
+                                {% for t in all_tasks %}
+                                <option value="{{ t.id }}">{{ t.title }} ({{ t.project.name }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -238,6 +247,17 @@
                             <select name="assigned_to" class="form-select">
                                 {% for u in users %}
                                 <option value="{{ u.id }}" {{ 'selected' if task.assigned_to == u.id else '' }}>{{ u.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Depends On (Parent Task)</label>
+                            <select name="parent_task_id" class="form-select">
+                                <option value="">None</option>
+                                {% for t in all_tasks %}
+                                {% if t.id != task.id %}
+                                <option value="{{ t.id }}" {{ 'selected' if task.parent_task_id == t.id else '' }}>{{ t.title }} ({{ t.project.name }})</option>
+                                {% endif %}
                                 {% endfor %}
                             </select>
                         </div>

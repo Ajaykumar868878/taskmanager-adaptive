@@ -1,95 +1,201 @@
-# Smart Task Manager
+# Smart Task - Adaptive Task Manager
 
-An Adaptive Smart Task Manager with Risk Detection & Activity Insights built with Flask and MySQL.
+> **An adaptive productivity platform that identifies risks, improves collaboration, and helps teams focus on high-impact work.**
+
+---
+
+## Problem Statement
+
+Modern teams struggle with:
+- **Missed deadlines** due to poor visibility of task urgency
+- **Fragmented communication** across multiple tools
+- **No early warning system** for tasks approaching deadlines
+- **Lack of accountability** with unclear ownership and status tracking
+- **No dependency awareness** — teams start tasks that are blocked by incomplete work
+
+## Solution
+
+**Smart Task** solves these problems with an intelligent, all-in-one task management platform:
+
+- **Automatic Risk Detection** — Tasks are classified as Critical, Warning, or Safe based on real-time due date analysis
+- **Built-in Chat & AI Assistant** — Team communication, group chats, DMs, and broadcast announcements in one place, plus an AI helper for productivity tips
+- **Task Dependencies** — Block tasks until their parent tasks are complete, preventing wasted effort
+- **Admin-Only Control** — Only admins can create projects, assign tasks, and manage team structure
+- **Focus Mode** — Instantly filter to see only what matters: your tasks, high-priority items, and risks
+- **Dashboard Insights** — AI-generated summaries, productivity metrics, and upcoming deadline timelines
+
+---
+
+## Architecture
+
+```
++------------------+     +------------------+     +------------------+
+|   Flask Server   |---->|   SQLite DB      |     |   Jinja2/HTML    |
+|   (Python 3.12)  |     |   (Local file)   |     |   (Bootstrap 5)  |
++------------------+     +------------------+     +------------------+
+         |                        |                        |
+         |   Flask-SQLAlchemy     |   ORM Models           |   CSS Custom Theme
+         |   Flask-Bcrypt         |   User, Project, Task  |   Inter Font
+         |   Sessions             |   ChatGroup, Message   |   Responsive Cards
+         v                        v                        v
+    Auth & Role           Data Persistence            UI Rendering
+    Admin/Member          Cascade Deletes             Light Blue/Cyan
+    Decorators            Risk Calculation            Professional Look
+```
+
+### Database Schema
+
+| Entity      | Key Fields                                                  |
+|-------------|------------------------------------------------------------|
+| **User**    | username, email, password (bcrypt), role (admin/member)    |
+| **Project** | name, description, owner_id, members (many-to-many)      |
+| **Task**    | title, priority, due_date, status, assignee, parent_task  |
+| **TaskHistory** | task_id, old_status, new_status, changed_by, timestamp |
+| **Activity**| action, entity_type, description, user_id, timestamp       |
+| **ChatGroup** | name, creator, members (many-to-many)                    |
+| **Message** | content, sender, receiver, group, is_broadcast, timestamp |
+
+---
 
 ## Features
 
-- **Authentication**: Signup, Login, Logout with session-based protection
-- **User Roles**: Admin (full control) and Member (limited access)
-- **Projects**: Create projects, add/remove members, view project stats
-- **Task Management**: Create, edit, delete tasks with priority, due date, assignee, and status flow (Todo -> In Progress -> Done)
-- **Risk Detection**: Automatic classification (Critical/Warning/Safe) based on due dates
-- **Activity Feed**: Real-time tracking of all actions (task created, updated, status changed, assigned)
-- **Task History**: Timeline view of status changes for each task
-- **Focus Mode**: Toggle to show only your tasks, high-priority tasks, and risky tasks
-- **Insights**: Dashboard analytics with stats, priority breakdown, and daily summaries
-- **Filters**: Filter tasks by project, status, priority, and assigned user
+### Core Task Management
+- Create, edit, delete tasks with title, description, priority, due date, and assignee
+- Status flow: **Todo &rarr; In Progress &rarr; Done**
+- Task history tracking with timestamps and who made each change
+- Task dependencies: set a parent task, and child tasks are marked as **blocked** until the parent is complete
+
+### Risk Detection
+- **Critical** (red): Task is overdue and not done
+- **Warning** (orange): Task is due within 2 days
+- **Safe** (green): Task has more than 2 days remaining or is completed
+
+### Dashboard
+- **Hero statement** with user greeting
+- **AI Insight banner** with personalized daily summary
+- **Stats cards**: Team Productivity %, Completion Rate, Overdue Rate, Avg Completion Time
+- **Risk Overview** with progress bars
+- **Priority Breakdown** (High/Medium/Low)
+- **Special Sections**: Overdue Tasks, Blocked Tasks, Stale Tasks
+- **Upcoming Deadlines Timeline** (next 7 days, scrollable cards)
+- **Risky Tasks table**
+- **Activity Feed**
+- **Focus Mode toggle**
+
+### Team Collaboration
+- **Chat system**: AI Assistant, Direct Messages, Group Chats, Broadcast Announcements
+- **Group creation** (admin only) with member selection
+- **Message timestamps** on all chats
+- **Broadcast** visible to everyone, but only admins can post
+
+### Role-Based Access Control
+| Action | Admin | Member |
+|--------|-------|--------|
+| Create Project | Yes | No |
+| Delete Project | Yes | No |
+| Create Task | Yes | No |
+| Delete Task | Yes | No |
+| Edit Task (full) | Yes | No |
+| Change Status (own tasks) | Yes | Yes |
+| View Chat / AI | Yes | Yes |
+| Send Broadcast | Yes | No |
+| Create Group | Yes | No |
+
+---
+
+## Screenshots
+
+*(Add screenshots of: Dashboard, Task List, Chat, Project Management)*
+
+| Screen | Description |
+|--------|-------------|
+| Dashboard | Hero statement, AI insights, stats, risk overview, upcoming deadlines |
+| Tasks | Filterable table with risk badges, priority colors, edit/delete |
+| Task Detail | Info cards, dependency chain, blocked warning, history timeline |
+| Projects | Card grid with member management, delete control |
+| Chat | Sidebar with AI, DMs, groups, broadcasts; message bubbles with timestamps |
+
+---
+
+## Future Scope
+
+- [ ] **Gemini AI Integration** — Replace rule-based AI with Google Gemini for smarter, context-aware responses
+- [ ] **Email Notifications** — Alerts for overdue tasks, new assignments, and broadcast messages
+- [ ] **File Attachments** — Upload files to tasks and chat messages
+- [ ] **Recurring Tasks** — Auto-create tasks on a schedule (daily, weekly, monthly)
+- [ ] **Kanban Board View** — Drag-and-drop task status management
+- [ ] **Real-time Chat** — WebSocket-based live messaging without page refresh
+- [ ] **Dark Mode** — Toggle between light and dark themes
+- [ ] **Export Reports** — PDF/CSV export of task analytics and project summaries
+- [ ] **Multi-language Support** — Internationalization for global teams
+
+---
 
 ## Tech Stack
 
-- **Backend**: Flask, Flask-SQLAlchemy, Flask-Bcrypt
-- **Database**: MySQL (via PyMySQL)
-- **Frontend**: Bootstrap 5, Bootstrap Icons, custom CSS
+| Layer | Technology |
+|-------|------------|
+| Backend | Flask, Flask-SQLAlchemy, Flask-Bcrypt |
+| Database | SQLite (zero-config, auto-creates on startup) |
+| Frontend | Bootstrap 5, Bootstrap Icons, Custom CSS |
+| Font | Inter (Google Fonts) |
+| Theme | Light blue / cyan professional aesthetic |
+
+---
 
 ## Setup Instructions
 
 ### 1. Prerequisites
-
 - Python 3.9+
-- MySQL Server running locally
 
-### 2. Create MySQL Database
-
-Open MySQL and run:
-
-```sql
-CREATE DATABASE smart_task_manager;
-```
-
-### 3. Install Dependencies
-
+### 2. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configure Database Connection
-
-Edit `app.py` and update the `SQLALCHEMY_DATABASE_URI` if your MySQL credentials differ:
-
-```python
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://username:password@localhost/smart_task_manager'
-```
-
-Default is `root` user with no password.
-
-### 5. Initialize Database
-
+### 3. Run the Application
 ```bash
 python app.py
 ```
 
-Then visit `http://127.0.0.1:5000/init-db` to create tables and a default admin user.
+### 4. Initialize Database
+Visit `http://127.0.0.1:5000/init-db` to create tables and a default admin user.
 
-### 6. Login
-
+### 5. Login
 - **Admin**: `admin` / `admin123`
-- Or sign up with a new account
+- Or sign up with a new account (members only)
+
+---
 
 ## Project Structure
 
 ```
-smart task manager/
-  app.py                 # Main Flask application
-  requirements.txt       # Python dependencies
+smart-task-manager/
+  app.py
+  requirements.txt
+  README.md
+  instance/
+    smart_task_manager.db
   templates/
-    base.html            # Base layout with navbar
-    login.html           # Login page
-    signup.html          # Signup page
-    dashboard.html       # Dashboard with stats, risks, activity, insights
-    projects.html        # Project list and management
-    tasks.html           # Task list with filters
-    task_detail.html     # Task detail with history timeline
+    base.html
+    login.html
+    signup.html
+    dashboard.html
+    projects.html
+    tasks.html
+    task_detail.html
+    chat.html
 ```
 
-## Default Admin Credentials
+---
 
-- **Username**: `admin`
-- **Password**: `admin123`
-- **Role**: Admin
+## Default Credentials
 
-## Risk Logic
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | `admin` | `admin123` |
+| Member | Sign up | Your choice |
 
-- **Critical**: Task is overdue and not done
-- **Warning**: Task is due within 2 days and not done
-- **Safe**: Task has more than 2 days remaining or is completed
-# taskmanager-adaptive
+---
+
+*Built with Flask and a lot of caffeine.*
