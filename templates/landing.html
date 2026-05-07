@@ -1,39 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Task - Adaptive Task Manager</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         :root {
-            --primary: #00acc1;
-            --primary-light: #4dd0e1;
-            --primary-dark: #0097a7;
-            --accent: #29b6f6;
-            --text: #263238;
-            --text-light: #78909c;
+            --primary: #7c4dff;
+            --primary-light: #b388ff;
+            --primary-dark: #651fff;
+            --accent: #448aff;
+            --bg-start: #0d0d15;
+            --bg-end: #12121f;
+            --card: rgba(255,255,255,0.03);
+            --card-border: rgba(255,255,255,0.06);
+            --text: #e8e8f0;
+            --text-light: #8a8aa5;
+            --glass-bg: rgba(20,20,35,0.7);
+            --glass-border: rgba(255,255,255,0.06);
         }
-        * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        * { font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif; }
+        html { transition: background 0.3s ease, color 0.3s ease; }
         body {
-            background: linear-gradient(135deg, #e0f7fa 0%, #e3f2fd 100%);
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
             background-attachment: fixed;
             color: var(--text);
             min-height: 100vh;
         }
         .navbar {
-            background: rgba(255,255,255,0.85);
+            background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0,0,0,0.04);
-            box-shadow: 0 2px 20px rgba(0,172,193,0.08);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
             padding: 0.75rem 0;
         }
         .navbar-brand {
             font-weight: 800;
             font-size: 1.35rem;
-            color: var(--primary-dark) !important;
+            color: var(--primary-light) !important;
             letter-spacing: -0.5px;
         }
         .navbar-brand i { color: var(--primary); }
@@ -46,24 +54,8 @@
             transition: all 0.2s ease;
         }
         .nav-link:hover {
-            color: var(--primary-dark) !important;
-            background: rgba(0,172,193,0.08);
-        }
-        .hero {
-            padding: 80px 0 60px;
-        }
-        .hero h1 {
-            font-weight: 800;
-            font-size: 2.8rem;
-            letter-spacing: -1px;
-            line-height: 1.2;
-            color: var(--text);
-        }
-        .hero p {
-            font-size: 1.1rem;
-            color: var(--text-light);
-            max-width: 520px;
-            line-height: 1.7;
+            color: var(--primary-light) !important;
+            background: rgba(124,77,255,0.08);
         }
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -71,35 +63,66 @@
             border-radius: 14px;
             font-weight: 600;
             padding: 0.75rem 2rem;
-            box-shadow: 0 4px 16px rgba(0,172,193,0.3);
+            box-shadow: 0 4px 16px rgba(124,77,255,0.3);
             transition: all 0.2s ease;
+            color: white;
         }
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0,172,193,0.4);
+            box-shadow: 0 6px 20px rgba(124,77,255,0.4);
+            color: white;
         }
         .btn-outline-primary {
             border: 2px solid var(--primary);
-            color: var(--primary-dark);
+            color: var(--primary-light);
             border-radius: 14px;
             font-weight: 600;
             padding: 0.75rem 2rem;
+            background: transparent;
         }
         .btn-outline-primary:hover {
             background: var(--primary);
+            border-color: var(--primary);
             color: white;
         }
-        .feature-card {
-            background: white;
+        .hero {
+            padding: 60px 0 40px;
+        }
+        .hero h1 {
+            font-weight: 800;
+            font-size: 2.6rem;
+            letter-spacing: -1px;
+            line-height: 1.2;
+            color: var(--text);
+        }
+        .hero p {
+            font-size: 1.05rem;
+            color: var(--text-light);
+            max-width: 520px;
+            line-height: 1.7;
+        }
+        .hero-img {
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(124,77,255,0.15);
+            border: 1px solid var(--card-border);
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+        .glass-card {
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
             border-radius: 24px;
             padding: 2rem;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
-            height: 100%;
         }
-        .feature-card:hover {
+        .glass-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0,172,193,0.12);
+            box-shadow: 0 12px 40px rgba(124,77,255,0.15);
+            border-color: rgba(124,77,255,0.15);
         }
         .feature-icon {
             width: 56px;
@@ -111,17 +134,30 @@
             font-size: 1.6rem;
             margin-bottom: 1.25rem;
         }
-        .stats-row {
-            background: white;
-            border-radius: 24px;
-            padding: 2rem;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
-        }
         .footer {
             padding: 2rem 0;
             text-align: center;
             color: var(--text-light);
             font-size: 0.85rem;
+            border-top: 1px solid var(--card-border);
+        }
+        .glow-text {
+            background: linear-gradient(135deg, var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .mini-chart {
+            height: 6px;
+            border-radius: 50px;
+            background: var(--card-border);
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .mini-chart-bar {
+            height: 100%;
+            border-radius: 50px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
         }
     </style>
 </head>
@@ -131,8 +167,11 @@
             <a class="navbar-brand" href="#">
                 <i class="bi bi-lightning-charge-fill me-2"></i>Smart Task
             </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
             <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav ms-auto gap-1">
+                <ul class="navbar-nav ms-auto gap-1 align-items-center">
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('login') }}"><i class="bi bi-box-arrow-in-right me-1"></i> Login</a>
                     </li>
@@ -147,36 +186,16 @@
     <section class="hero">
         <div class="container">
             <div class="row align-items-center g-5">
-                <div class="col-lg-7">
-                    <h1>An adaptive productivity platform that identifies risks, improves collaboration, and helps teams focus on high-impact work.</h1>
+                <div class="col-lg-6">
+                    <h1>An adaptive productivity platform that identifies risks, improves collaboration, and helps teams focus on <span class="glow-text">high-impact work.</span></h1>
                     <p class="mt-4 mb-4">Smart Task combines intelligent risk detection, real-time team collaboration, and AI-powered insights into one seamless workspace.</p>
                     <div class="d-flex gap-3 flex-wrap">
                         <a href="{{ url_for('signup') }}" class="btn btn-primary btn-lg"><i class="bi bi-rocket-takeoff me-2"></i>Get Started Free</a>
                         <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg"><i class="bi bi-box-arrow-in-right me-2"></i>Sign In</a>
                     </div>
                 </div>
-                <div class="col-lg-5">
-                    <div class="stats-row">
-                        <h5 class="fw-bold mb-4"><i class="bi bi-graph-up-arrow text-primary me-2"></i>What teams are achieving</h5>
-                        <div class="row text-center g-3">
-                            <div class="col-6">
-                                <h2 class="fw-bold text-primary mb-1">30%</h2>
-                                <small class="text-muted">Faster Delivery</small>
-                            </div>
-                            <div class="col-6">
-                                <h2 class="fw-bold text-primary mb-1">95%</h2>
-                                <small class="text-muted">On-Time Tasks</small>
-                            </div>
-                            <div class="col-6">
-                                <h2 class="fw-bold text-primary mb-1">50%</h2>
-                                <small class="text-muted">Fewer Overdue</small>
-                            </div>
-                            <div class="col-6">
-                                <h2 class="fw-bold text-primary mb-1">24/7</h2>
-                                <small class="text-muted">AI Assistance</small>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-lg-6">
+                    <img src="https://images.unsplash.com/photo-1551434678-e076c223a692?w=700&auto=format&fit=crop&q=80" alt="Team productivity dashboard" class="hero-img">
                 </div>
             </div>
         </div>
@@ -184,45 +203,70 @@
 
     <section class="py-5">
         <div class="container">
-            <div class="text-center mb-5">
+            <div class="glass-card mb-5">
+                <div class="row text-center g-4">
+                    <div class="col-6 col-md-3">
+                        <h3 class="fw-bold glow-text mb-1">30%</h3>
+                        <small class="text-light">Faster Delivery</small>
+                        <div class="mini-chart"><div class="mini-chart-bar" style="width: 30%"></div></div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <h3 class="fw-bold glow-text mb-1">95%</h3>
+                        <small class="text-light">On-Time Tasks</small>
+                        <div class="mini-chart"><div class="mini-chart-bar" style="width: 95%"></div></div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <h3 class="fw-bold glow-text mb-1">50%</h3>
+                        <small class="text-light">Fewer Overdue</small>
+                        <div class="mini-chart"><div class="mini-chart-bar" style="width: 50%"></div></div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <h3 class="fw-bold glow-text mb-1">24/7</h3>
+                        <small class="text-light">AI Assistance</small>
+                        <div class="mini-chart"><div class="mini-chart-bar" style="width: 100%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mb-5 mt-5">
                 <h2 class="fw-bold mb-2">Why teams choose Smart Task</h2>
-                <p class="text-muted">Four pillars that transform how your team works</p>
+                <p class="text-light">Four pillars that transform how your team works</p>
             </div>
             <div class="row g-4">
                 <div class="col-md-3">
-                    <div class="feature-card">
-                        <div class="feature-icon" style="background: linear-gradient(135deg, #ffebee, #ffcdd2); color: #c62828;">
+                    <div class="glass-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, rgba(239,83,80,0.15), rgba(239,83,80,0.05)); color: #ff5252;">
                             <i class="bi bi-shield-exclamation"></i>
                         </div>
                         <h5 class="fw-bold mb-2">Risk Detection</h5>
-                        <p class="text-muted small mb-0">Automatic Critical/Warning/Safe classification based on due dates. Never miss a deadline again.</p>
+                        <p class="text-light small mb-0">Automatic Critical/Warning/Safe classification based on due dates. Never miss a deadline again.</p>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="feature-card">
-                        <div class="feature-icon" style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); color: #7b1fa2;">
+                    <div class="glass-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, rgba(124,77,255,0.15), rgba(124,77,255,0.05)); color: #b388ff;">
                             <i class="bi bi-robot"></i>
                         </div>
                         <h5 class="fw-bold mb-2">AI Assistant</h5>
-                        <p class="text-muted small mb-0">Get personalized productivity tips, overdue alerts, and task summaries from your built-in AI.</p>
+                        <p class="text-light small mb-0">Get personalized productivity tips, overdue alerts, and task summaries from your built-in AI.</p>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="feature-card">
-                        <div class="feature-icon" style="background: linear-gradient(135deg, #e1f5fe, #b3e5fc); color: #0288d1;">
+                    <div class="glass-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, rgba(68,138,255,0.15), rgba(68,138,255,0.05)); color: #448aff;">
                             <i class="bi bi-people-fill"></i>
                         </div>
                         <h5 class="fw-bold mb-2">Team Collaboration</h5>
-                        <p class="text-muted small mb-0">Built-in chat, group conversations, DMs, and broadcast announcements — all in one place.</p>
+                        <p class="text-light small mb-0">Built-in chat, group conversations, DMs, and broadcast announcements — all in one place.</p>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="feature-card">
-                        <div class="feature-icon" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32;">
+                    <div class="glass-card">
+                        <div class="feature-icon" style="background: linear-gradient(135deg, rgba(102,187,106,0.15), rgba(102,187,106,0.05)); color: #69f0ae;">
                             <i class="bi bi-graph-up-arrow"></i>
                         </div>
                         <h5 class="fw-bold mb-2">Productivity Insights</h5>
-                        <p class="text-muted small mb-0">Track completion rates, overdue trends, average completion time, and team productivity at a glance.</p>
+                        <p class="text-light small mb-0">Track completion rates, overdue trends, average completion time, and team productivity at a glance.</p>
                     </div>
                 </div>
             </div>
@@ -233,15 +277,15 @@
         <div class="container">
             <div class="row g-4 align-items-center">
                 <div class="col-lg-6">
-                    <div class="card border-0 p-4" style="border-radius:24px; background: linear-gradient(135deg, #e1f5fe, #b3e5fc);">
+                    <div class="glass-card p-4">
                         <h5 class="fw-bold mb-3"><i class="bi bi-check2-circle text-primary me-2"></i>Task Dependencies</h5>
-                        <p class="mb-0 text-muted">Set parent-child relationships between tasks. Dependent tasks are automatically blocked until the parent is completed, preventing wasted effort and keeping workflows logical.</p>
+                        <p class="mb-0 text-light">Set parent-child relationships between tasks. Dependent tasks are automatically blocked until the parent is completed, preventing wasted effort and keeping workflows logical.</p>
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <div class="card border-0 p-4" style="border-radius:24px; background: linear-gradient(135deg, #fff8e1, #ffecb3);">
-                        <h5 class="fw-bold mb-3"><i class="bi bi-eye-fill text-warning me-2"></i>Focus Mode</h5>
-                        <p class="mb-0 text-muted">One-click filter to show only your tasks, high-priority items, and risky tasks. Cut through the noise and focus on what matters most.</p>
+                    <div class="glass-card p-4">
+                        <h5 class="fw-bold mb-3"><i class="bi bi-eye-fill text-primary me-2"></i>Focus Mode</h5>
+                        <p class="mb-0 text-light">One-click filter to show only your tasks, high-priority items, and risky tasks. Cut through the noise and focus on what matters most.</p>
                     </div>
                 </div>
             </div>

@@ -2,11 +2,11 @@
 {% block title %}Dashboard - Smart Task{% endblock %}
 {% block content %}
 <!-- Hero Statement -->
-<div class="p-4 mb-4 rounded-4" style="background: linear-gradient(135deg, #e0f7fa, #e3f2fd); border: 1px solid rgba(0,172,193,0.15);">
+<div class="p-4 mb-4 rounded-4" style="background: linear-gradient(135deg, var(--primary-dark), var(--accent)); border: 1px solid var(--card-border);">
     <div class="row align-items-center">
         <div class="col-md-8">
-            <h1 class="fw-bold mb-2" style="font-size: 1.6rem; color: var(--primary-dark);">Welcome back, {{ user.username }}!</h1>
-            <p class="mb-0" style="color: #546e7a; font-size: 0.95rem;">
+            <h1 class="fw-bold mb-2" style="font-size: 1.6rem; color: white;">Welcome back, {{ user.username }}!</h1>
+            <p class="mb-0" style="color: rgba(255,255,255,0.85); font-size: 0.95rem;">
                 <strong>Smart Task</strong> &mdash; An adaptive productivity platform that identifies risks, improves collaboration, and helps teams focus on high-impact work.
             </p>
         </div>
@@ -25,14 +25,14 @@
 {% endif %}
 
 <!-- AI Insight Banner -->
-<div class="card p-4 mb-4" style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); border: none;">
+<div class="card p-4 mb-4">
     <div class="d-flex align-items-center">
-        <div class="stat-icon me-3" style="background: linear-gradient(135deg, #ce93d8, #ab47bc); color: white; width: 52px; height: 52px;">
+        <div class="stat-icon me-3" style="background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; width: 52px; height: 52px;">
             <i class="bi bi-robot fs-4"></i>
         </div>
         <div>
-            <h6 class="fw-bold mb-1" style="color: #4a148c;"><i class="bi bi-stars me-1"></i>AI Insight</h6>
-            <p class="mb-0" style="color: #6a1b9a;">{{ ai_message }}</p>
+            <h6 class="fw-bold mb-1" style="color: var(--primary-light);"><i class="bi bi-stars me-1"></i>AI Insight</h6>
+            <p class="mb-0" style="color: var(--text-light);">{{ ai_message }}</p>
         </div>
     </div>
 </div>
@@ -42,12 +42,13 @@
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card card-hover">
             <div class="d-flex align-items-center">
-                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #e1f5fe, #b3e5fc); color: #0288d1;">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, var(--primary), var(--accent)); color: white;">
                     <i class="bi bi-graph-up-arrow"></i>
                 </div>
-                <div>
+                <div class="flex-grow-1">
                     <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Team Productivity</h6>
                     <h3 class="fw-bold mb-0">{{ insights.productivity_pct }}%</h3>
+                    <canvas id="spark1" height="30" style="max-width: 100px;"></canvas>
                 </div>
             </div>
         </div>
@@ -55,12 +56,13 @@
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card card-hover">
             <div class="d-flex align-items-center">
-                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9); color: #2e7d32;">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #69f0ae, #00e676); color: #0d0d15;">
                     <i class="bi bi-check-circle-fill"></i>
                 </div>
-                <div>
+                <div class="flex-grow-1">
                     <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Completion Rate</h6>
                     <h3 class="fw-bold mb-0">{{ insights.completion_rate }}%</h3>
+                    <canvas id="spark2" height="30" style="max-width: 100px;"></canvas>
                 </div>
             </div>
         </div>
@@ -68,12 +70,13 @@
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card card-hover">
             <div class="d-flex align-items-center">
-                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #ffebee, #ffcdd2); color: #c62828;">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #ff5252, #ff1744); color: white;">
                     <i class="bi bi-exclamation-triangle-fill"></i>
                 </div>
-                <div>
+                <div class="flex-grow-1">
                     <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Overdue Rate</h6>
                     <h3 class="fw-bold mb-0">{{ insights.overdue_rate }}%</h3>
+                    <canvas id="spark3" height="30" style="max-width: 100px;"></canvas>
                 </div>
             </div>
         </div>
@@ -81,12 +84,13 @@
     <div class="col-sm-6 col-xl-3">
         <div class="stat-card card-hover">
             <div class="d-flex align-items-center">
-                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #ef6c00;">
+                <div class="stat-icon me-3" style="background: linear-gradient(135deg, #ffd740, #ffab00); color: #0d0d15;">
                     <i class="bi bi-clock-history"></i>
                 </div>
-                <div>
+                <div class="flex-grow-1">
                     <h6 class="text-muted mb-1" style="font-size:0.82rem;font-weight:600;">Avg Completion Time</h6>
                     <h3 class="fw-bold mb-0">{{ insights.avg_completion_days }}d</h3>
+                    <canvas id="spark4" height="30" style="max-width: 100px;"></canvas>
                 </div>
             </div>
         </div>
@@ -97,52 +101,26 @@
 <div class="row g-3 mb-4">
     <div class="col-lg-4">
         <div class="card p-4 h-100">
-            <h5 class="section-title mb-4"><i class="bi bi-shield-exclamation text-danger me-2"></i>Risk Overview</h5>
-            {% set total_risk = risk_counts.critical + risk_counts.warning + risk_counts.safe %}
-            {% set pct_critical = (risk_counts.critical / total_risk * 100) if total_risk > 0 else 0 %}
-            {% set pct_warning = (risk_counts.warning / total_risk * 100) if total_risk > 0 else 0 %}
-            {% set pct_safe = (risk_counts.safe / total_risk * 100) if total_risk > 0 else 0 %}
-            {% if total_risk > 0 %}
-            <div class="mb-4">
-                <div class="d-flex justify-content-between small mb-1">
-                    <span class="fw-semibold">Critical</span>
-                    <span class="fw-bold">{{ risk_counts.critical }}</span>
-                </div>
-                <div class="progress mb-3">
-                    <div class="progress-bar bg-danger" style="width: {{ pct_critical }}%"></div>
-                </div>
-                <div class="d-flex justify-content-between small mb-1">
-                    <span class="fw-semibold">Warning</span>
-                    <span class="fw-bold">{{ risk_counts.warning }}</span>
-                </div>
-                <div class="progress mb-3">
-                    <div class="progress-bar" style="width: {{ pct_warning }}%; background: #ffa726;"></div>
-                </div>
-                <div class="d-flex justify-content-between small mb-1">
-                    <span class="fw-semibold">Safe</span>
-                    <span class="fw-bold">{{ risk_counts.safe }}</span>
-                </div>
-                <div class="progress">
-                    <div class="progress-bar bg-success" style="width: {{ pct_safe }}%"></div>
-                </div>
+            <h5 class="section-title mb-3"><i class="bi bi-shield-exclamation text-danger me-2"></i>Risk Overview</h5>
+            <div style="max-height: 220px;">
+                <canvas id="riskChart"></canvas>
             </div>
-            {% endif %}
-            <div class="row g-2 text-center">
+            <div class="row g-2 text-center mt-3">
                 <div class="col-4">
-                    <div class="p-2 rounded-3" style="background:#ffebee;">
-                        <h5 class="fw-bold text-danger mb-0">{{ risk_counts.critical }}</h5>
+                    <div class="p-2 rounded-3" style="background: rgba(239,83,80,0.12);">
+                        <h5 class="fw-bold mb-0" style="color: #ff5252;">{{ risk_counts.critical }}</h5>
                         <small class="text-muted">Critical</small>
                     </div>
                 </div>
                 <div class="col-4">
-                    <div class="p-2 rounded-3" style="background:#fff3e0;">
-                        <h5 class="fw-bold mb-0" style="color:#ef6c00;">{{ risk_counts.warning }}</h5>
+                    <div class="p-2 rounded-3" style="background: rgba(255,167,38,0.12);">
+                        <h5 class="fw-bold mb-0" style="color: #ffb74d;">{{ risk_counts.warning }}</h5>
                         <small class="text-muted">Warning</small>
                     </div>
                 </div>
                 <div class="col-4">
-                    <div class="p-2 rounded-3" style="background:#e8f5e9;">
-                        <h5 class="fw-bold text-success mb-0">{{ risk_counts.safe }}</h5>
+                    <div class="p-2 rounded-3" style="background: rgba(102,187,106,0.12);">
+                        <h5 class="fw-bold mb-0" style="color: #69f0ae;">{{ risk_counts.safe }}</h5>
                         <small class="text-muted">Safe</small>
                     </div>
                 </div>
@@ -151,29 +129,9 @@
     </div>
     <div class="col-lg-8">
         <div class="card p-4 h-100">
-            <h5 class="section-title mb-4"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Priority Breakdown</h5>
-            <div class="row text-center g-4">
-                <div class="col-md-4">
-                    <div class="p-4 rounded-4" style="background: linear-gradient(135deg, #ffebee, #ffcdd2);">
-                        <i class="bi bi-arrow-up-circle-fill text-danger fs-1 mb-2 d-block"></i>
-                        <h2 class="fw-bold mb-1">{{ insights.high_priority }}</h2>
-                        <span class="fw-semibold text-muted">High Priority</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-4 rounded-4" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2);">
-                        <i class="bi bi-dash-circle-fill fs-1 mb-2 d-block" style="color:#ef6c00;"></i>
-                        <h2 class="fw-bold mb-1">{{ insights.medium_priority }}</h2>
-                        <span class="fw-semibold text-muted">Medium Priority</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="p-4 rounded-4" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9);">
-                        <i class="bi bi-arrow-down-circle-fill text-success fs-1 mb-2 d-block"></i>
-                        <h2 class="fw-bold mb-1">{{ insights.low_priority }}</h2>
-                        <span class="fw-semibold text-muted">Low Priority</span>
-                    </div>
-                </div>
+            <h5 class="section-title mb-3"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Priority Breakdown</h5>
+            <div style="max-height: 260px;">
+                <canvas id="priorityChart"></canvas>
             </div>
         </div>
     </div>
@@ -365,8 +323,8 @@
     <h5 class="section-title mb-4"><i class="bi bi-lightbulb-fill text-warning me-2"></i>Insights</h5>
     <div class="row g-3">
         <div class="col-md-6">
-            <div class="d-flex align-items-center p-4 rounded-4" style="background: linear-gradient(135deg, #fff8e1, #ffecb3);">
-                <i class="bi bi-trophy-fill fs-2 me-4" style="color:#f9a825;"></i>
+            <div class="d-flex align-items-center p-4 rounded-4" style="background: linear-gradient(135deg, rgba(255,215,64,0.08), rgba(255,171,0,0.08)); border: 1px solid var(--card-border);">
+                <i class="bi bi-trophy-fill fs-2 me-4" style="color: var(--warning);"></i>
                 <div>
                     <h6 class="fw-bold mb-1">You completed {{ insights.today_completed }} tasks today</h6>
                     <p class="text-muted small mb-0">Keep up the momentum!</p>
@@ -374,7 +332,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="d-flex align-items-center p-4 rounded-4" style="background: linear-gradient(135deg, #ffebee, #ffcdd2);">
+            <div class="d-flex align-items-center p-4 rounded-4" style="background: linear-gradient(135deg, rgba(239,83,80,0.08), rgba(255,23,68,0.08)); border: 1px solid var(--card-border);">
                 <i class="bi bi-calendar-x-fill fs-2 me-4 text-danger"></i>
                 <div>
                     <h6 class="fw-bold mb-1">{{ insights.overdue }} tasks are delayed</h6>
@@ -384,4 +342,95 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? '#e8e8f0' : '#263238';
+    const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)';
+
+    // Risk Doughnut Chart
+    const riskCtx = document.getElementById('riskChart');
+    if (riskCtx) {
+        new Chart(riskCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Critical', 'Warning', 'Safe'],
+                datasets: [{
+                    data: [{{ risk_counts.critical }}, {{ risk_counts.warning }}, {{ risk_counts.safe }}],
+                    backgroundColor: ['#ff5252', '#ffb74d', '#69f0ae'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: textColor, font: { size: 11 }, boxWidth: 12 } }
+                },
+                cutout: '65%'
+            }
+        });
+    }
+
+    // Priority Bar Chart
+    const prioCtx = document.getElementById('priorityChart');
+    if (prioCtx) {
+        new Chart(prioCtx, {
+            type: 'bar',
+            data: {
+                labels: ['High', 'Medium', 'Low'],
+                datasets: [{
+                    label: 'Tasks',
+                    data: [{{ insights.high_priority }}, {{ insights.medium_priority }}, {{ insights.low_priority }}],
+                    backgroundColor: ['#ff5252', '#ffb74d', '#69f0ae'],
+                    borderRadius: 8,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { ticks: { color: textColor, font: { size: 12 } }, grid: { display: false } },
+                    y: { ticks: { color: textColor, font: { size: 11 } }, grid: { color: gridColor } }
+                }
+            }
+        });
+    }
+
+    // Mini sparkline bars for stat cards
+    function sparkline(id, value, color) {
+        const ctx = document.getElementById(id);
+        if (!ctx) return;
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1','2','3','4','5','6','7'],
+                datasets: [{
+                    data: [value*0.3, value*0.5, value*0.4, value*0.8, value*0.6, value*0.9, value],
+                    backgroundColor: color,
+                    borderRadius: 2,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            }
+        });
+    }
+    sparkline('spark1', {{ insights.productivity_pct }}, 'rgba(124,77,255,0.5)');
+    sparkline('spark2', {{ insights.completion_rate }}, 'rgba(105,240,174,0.5)');
+    sparkline('spark3', {{ insights.overdue_rate }}, 'rgba(255,82,82,0.5)');
+    sparkline('spark4', {{ insights.avg_completion_days|default(0, true) * 10 }}, 'rgba(255,215,64,0.5)');
+</script>
 {% endblock %}

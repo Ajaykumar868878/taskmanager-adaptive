@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,22 +19,56 @@
             --bg-start: #e0f7fa;
             --bg-end: #e3f2fd;
             --card: #ffffff;
+            --card-border: rgba(0,0,0,0.04);
             --text: #263238;
             --text-light: #78909c;
+            --input-border: #eceff1;
+            --glass-bg: rgba(255,255,255,0.7);
+            --glass-border: rgba(255,255,255,0.5);
+            --shadow: rgba(0,0,0,0.04);
+            --shadow-hover: rgba(0,172,193,0.12);
+            --table-border: rgba(0,0,0,0.04);
+            --table-hover: rgba(0,172,193,0.03);
+        }
+        [data-theme="dark"] {
+            --primary: #7c4dff;
+            --primary-light: #b388ff;
+            --primary-dark: #651fff;
+            --accent: #448aff;
+            --critical: #ff5252;
+            --warning: #ffb74d;
+            --safe: #69f0ae;
+            --bg-start: #0d0d15;
+            --bg-end: #12121f;
+            --card: rgba(255,255,255,0.03);
+            --card-border: rgba(255,255,255,0.06);
+            --text: #e8e8f0;
+            --text-light: #8a8aa5;
+            --input-border: rgba(255,255,255,0.08);
+            --glass-bg: rgba(20,20,35,0.7);
+            --glass-border: rgba(255,255,255,0.06);
+            --shadow: rgba(0,0,0,0.3);
+            --shadow-hover: rgba(124,77,255,0.2);
+            --table-border: rgba(255,255,255,0.04);
+            --table-hover: rgba(124,77,255,0.05);
         }
         * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        html { transition: background 0.3s ease, color 0.3s ease; }
         body {
             background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
             background-attachment: fixed;
             color: var(--text);
             min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
         }
         .navbar {
-            background: rgba(255,255,255,0.85);
+            background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0,0,0,0.04);
-            box-shadow: 0 2px 20px rgba(0,172,193,0.08);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 2px 20px var(--shadow);
             padding: 0.75rem 0;
+            transition: all 0.3s ease;
         }
         .navbar-brand {
             font-weight: 800;
@@ -53,23 +87,27 @@
         }
         .nav-link:hover, .nav-link.active {
             color: var(--primary-dark) !important;
-            background: rgba(0,172,193,0.08);
+            background: rgba(124,77,255,0.08);
         }
         .card {
-            border: none;
+            border: 1px solid var(--card-border);
             border-radius: 24px;
             background: var(--card);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 24px var(--shadow), 0 1px 3px var(--shadow);
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         .card-hover:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0,172,193,0.12);
+            box-shadow: 0 12px 40px var(--shadow-hover);
+            border-color: rgba(124,77,255,0.15);
         }
         .stat-card {
             border-radius: 20px;
             padding: 1.5rem;
             background: var(--card);
+            border: 1px solid var(--card-border);
         }
         .stat-icon {
             width: 52px;
@@ -80,60 +118,71 @@
             justify-content: center;
             font-size: 1.4rem;
         }
-        .badge-critical { background: #ffebee; color: #c62828; font-weight: 600; border-radius: 50px; padding: 6px 14px; font-size: 0.78rem; }
-        .badge-warning { background: #fff3e0; color: #ef6c00; font-weight: 600; border-radius: 50px; padding: 6px 14px; font-size: 0.78rem; }
-        .badge-safe { background: #e8f5e9; color: #2e7d32; font-weight: 600; border-radius: 50px; padding: 6px 14px; font-size: 0.78rem; }
-        .priority-high { background: #ffebee; color: #c62828; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
-        .priority-medium { background: #fff3e0; color: #ef6c00; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
-        .priority-low { background: #e8f5e9; color: #2e7d32; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
-        .status-todo { background: #eceff1; color: #546e7a; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
-        .status-progress { background: #e3f2fd; color: #1565c0; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
-        .status-done { background: #e8f5e9; color: #2e7d32; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .badge-critical { background: rgba(239,83,80,0.12); color: #ff5252; font-weight: 600; border-radius: 50px; padding: 6px 14px; font-size: 0.78rem; }
+        .badge-warning { background: rgba(255,167,38,0.12); color: #ffb74d; font-weight: 600; border-radius: 50px; padding: 6px 14px; font-size: 0.78rem; }
+        .badge-safe { background: rgba(102,187,106,0.12); color: #69f0ae; font-weight: 600; border-radius: 50px; padding: 6px 14px; font-size: 0.78rem; }
+        .priority-high { background: rgba(239,83,80,0.12); color: #ff5252; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .priority-medium { background: rgba(255,167,38,0.12); color: #ffb74d; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .priority-low { background: rgba(102,187,106,0.12); color: #69f0ae; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .status-todo { background: rgba(255,255,255,0.05); color: var(--text-light); border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .status-progress { background: rgba(68,138,255,0.12); color: #448aff; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
+        .status-done { background: rgba(102,187,106,0.12); color: #69f0ae; border-radius: 50px; font-weight: 600; font-size: 0.78rem; padding: 5px 12px; }
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border: none;
             border-radius: 14px;
             font-weight: 600;
             padding: 0.65rem 1.5rem;
-            box-shadow: 0 4px 16px rgba(0,172,193,0.3);
+            box-shadow: 0 4px 16px rgba(124,77,255,0.3);
             transition: all 0.2s ease;
+            color: white;
         }
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0,172,193,0.4);
-            background: linear-gradient(135deg, var(--primary-dark), #00838f);
+            box-shadow: 0 6px 20px rgba(124,77,255,0.4);
+            background: linear-gradient(135deg, var(--primary-dark), #5e35b1);
+            color: white;
         }
         .btn-outline-primary {
             border: 2px solid var(--primary);
-            color: var(--primary-dark);
+            color: var(--primary-light);
             border-radius: 14px;
             font-weight: 600;
+            background: transparent;
         }
         .btn-outline-primary:hover {
             background: var(--primary);
             border-color: var(--primary);
+            color: white;
         }
         .btn-outline-secondary {
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--input-border);
             color: var(--text-light);
             border-radius: 14px;
             font-weight: 600;
+            background: transparent;
+        }
+        .btn-outline-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary-light);
         }
         .focus-toggle {
-            background: linear-gradient(135deg, var(--accent), #0288d1);
+            background: linear-gradient(135deg, var(--accent), #7c4dff);
             border: none;
             color: white;
             border-radius: 14px;
             padding: 0.6rem 1.5rem;
             font-weight: 600;
             font-size: 0.9rem;
-            box-shadow: 0 4px 16px rgba(41,182,246,0.3);
+            box-shadow: 0 4px 16px rgba(124,77,255,0.3);
             transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
         }
-        .focus-toggle:hover { transform: translateY(-1px); }
+        .focus-toggle:hover { transform: translateY(-1px); color: white; }
         .focus-toggle.active {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            box-shadow: 0 4px 16px rgba(0,172,193,0.3);
+            box-shadow: 0 4px 16px rgba(124,77,255,0.3);
         }
         .timeline-item {
             position: relative;
@@ -163,7 +212,7 @@
         .timeline-item:last-child { padding-bottom: 0; }
         .activity-item {
             padding: 14px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
+            border-bottom: 1px solid var(--card-border);
         }
         .activity-item:last-child { border-bottom: none; }
         .activity-avatar {
@@ -181,27 +230,39 @@
         }
         .form-control, .form-select {
             border-radius: 14px;
-            border: 2px solid #eceff1;
+            border: 2px solid var(--input-border);
             padding: 0.7rem 1rem;
             font-weight: 500;
             font-size: 0.92rem;
+            background: var(--card);
+            color: var(--text);
+            transition: all 0.2s ease;
         }
         .form-control:focus, .form-select:focus {
             border-color: var(--primary-light);
-            box-shadow: 0 0 0 4px rgba(77,208,225,0.15);
+            box-shadow: 0 0 0 4px rgba(124,77,255,0.15);
+            background: var(--card);
+            color: var(--text);
         }
-        .modal-content { border-radius: 24px; border: none; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
-        .modal-header { border-bottom: 1px solid rgba(0,0,0,0.04); padding: 1.5rem; }
+        .modal-content {
+            border-radius: 24px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .modal-header { border-bottom: 1px solid var(--card-border); padding: 1.5rem; }
         .modal-body { padding: 1.5rem; }
-        .modal-footer { border-top: 1px solid rgba(0,0,0,0.04); padding: 1.25rem 1.5rem; }
-        .table { font-size: 0.9rem; }
+        .modal-footer { border-top: 1px solid var(--card-border); padding: 1.25rem 1.5rem; }
+        .table { font-size: 0.9rem; color: var(--text); }
         .table th { border-top: none; color: var(--text-light); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem 0.75rem; }
-        .table td { vertical-align: middle; padding: 1rem 0.75rem; border-color: rgba(0,0,0,0.04); }
+        .table td { vertical-align: middle; padding: 1rem 0.75rem; border-color: var(--table-border); }
         .table tbody tr { transition: background 0.15s ease; }
-        .table tbody tr:hover { background: rgba(0,172,193,0.03); }
+        .table tbody tr:hover { background: var(--table-hover); }
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
         .section-title { font-weight: 700; font-size: 1.15rem; color: var(--text); }
-        .progress { height: 8px; border-radius: 50px; background: #eceff1; }
+        .progress { height: 8px; border-radius: 50px; background: var(--input-border); }
         .progress-bar { border-radius: 50px; }
         .avatar-circle {
             width: 36px;
@@ -215,13 +276,40 @@
             font-weight: 700;
             font-size: 0.8rem;
         }
-        .dropdown-menu { border-radius: 16px; border: none; box-shadow: 0 8px 32px rgba(0,0,0,0.1); padding: 0.5rem; }
-        .dropdown-item { border-radius: 10px; padding: 0.6rem 1rem; font-weight: 500; font-size: 0.9rem; }
-        .dropdown-item:hover { background: rgba(0,172,193,0.08); color: var(--primary-dark); }
+        .dropdown-menu {
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            padding: 0.5rem;
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .dropdown-item { border-radius: 10px; padding: 0.6rem 1rem; font-weight: 500; font-size: 0.9rem; color: var(--text); }
+        .dropdown-item:hover { background: rgba(124,77,255,0.08); color: var(--primary-light); }
         .alert { border-radius: 16px; border: none; font-weight: 500; }
         .page-header { margin-bottom: 2rem; }
         .page-header h2 { font-weight: 800; font-size: 1.75rem; letter-spacing: -0.5px; }
         .page-header p { color: var(--text-light); font-size: 0.95rem; }
+        .theme-toggle {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 50px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+        }
+        .theme-toggle:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+            box-shadow: 0 0 12px rgba(124,77,255,0.2);
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -258,14 +346,21 @@
                         </a>
                     </li>
                 </ul>
-                <ul class="navbar-nav">
+                <ul class="navbar-nav align-items-center gap-2">
+                    <li class="nav-item">
+                        <button class="theme-toggle" id="themeToggle" type="button" title="Toggle theme">
+                            <i class="bi bi-moon-fill" id="themeIcon"></i>
+                        </button>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
                             <div class="avatar-circle me-2" style="width:32px;height:32px;font-size:0.75rem;">{{ session.username[0]|upper }}</div>
                             <span>{{ session.username }}</span>
-                            {% if session.role == 'admin' %}<span class="badge ms-2" style="background:#e0f7fa;color:var(--primary-dark);border-radius:50px;font-size:0.7rem;">ADMIN</span>{% endif %}
+                            {% if session.role == 'admin' %}<span class="badge ms-2" style="background: rgba(124,77,255,0.12); color: var(--primary-light); border-radius:50px; font-size:0.7rem;">ADMIN</span>{% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('settings') }}"><i class="bi bi-gear me-2"></i> Settings</a></li>
+                            <li><hr class="dropdown-divider" style="border-color: var(--card-border);"></li>
                             <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
                         </ul>
                     </li>
@@ -292,6 +387,36 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function() {
+            const html = document.documentElement;
+            const toggle = document.getElementById('themeToggle');
+            const icon = document.getElementById('themeIcon');
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = saved ? (saved === 'dark') : prefersDark;
+
+            function apply(dark) {
+                if (dark) {
+                    html.setAttribute('data-theme', 'dark');
+                    if (icon) icon.className = 'bi bi-sun-fill';
+                    if (toggle) toggle.title = 'Switch to light mode';
+                } else {
+                    html.removeAttribute('data-theme');
+                    if (icon) icon.className = 'bi bi-moon-fill';
+                    if (toggle) toggle.title = 'Switch to dark mode';
+                }
+            }
+            apply(isDark);
+            if (toggle) {
+                toggle.addEventListener('click', function() {
+                    const nowDark = html.getAttribute('data-theme') !== 'dark';
+                    apply(nowDark);
+                    localStorage.setItem('theme', nowDark ? 'dark' : 'light');
+                });
+            }
+        })();
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -340,6 +340,35 @@ def logout():
     flash('Logged out successfully.', 'success')
     return redirect(url_for('login'))
 
+@app.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    user = User.query.get(session['user_id'])
+    if request.method == 'POST':
+        action = request.form.get('action')
+        if action == 'update_profile':
+            email = request.form.get('email')
+            if email:
+                user.email = email
+                db.session.commit()
+                flash('Profile updated successfully.', 'success')
+        elif action == 'change_password':
+            current_password = request.form.get('current_password')
+            new_password = request.form.get('new_password')
+            confirm_password = request.form.get('confirm_password')
+            if not bcrypt.check_password_hash(user.password, current_password):
+                flash('Current password is incorrect.', 'error')
+            elif new_password != confirm_password:
+                flash('New passwords do not match.', 'error')
+            elif len(new_password) < 4:
+                flash('Password must be at least 4 characters.', 'error')
+            else:
+                user.password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+                db.session.commit()
+                flash('Password changed successfully.', 'success')
+        return redirect(url_for('settings'))
+    return render_template('settings.html', user=user)
+
 # ============== DASHBOARD ==============
 
 @app.route('/dashboard')
