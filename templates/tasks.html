@@ -298,10 +298,30 @@
             modal.show();
         });
     }
+    // Also ensure Create Task button explicitly submits the form
+    function initCreateTaskForm() {
+        var form = document.querySelector('#createTaskModal form');
+        var submitBtn = document.querySelector('#createTaskModal button[type="submit"]');
+        if (!form || !submitBtn) return;
+        submitBtn.addEventListener('click', function(e) {
+            // Let default submit happen, but ensure form is valid
+            if (form.checkValidity()) {
+                form.submit();
+            } else {
+                e.preventDefault();
+                form.reportValidity();
+            }
+        });
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initNewTaskModal);
+        document.addEventListener('DOMContentLoaded', function() {
+            initNewTaskModal();
+            initCreateTaskForm();
+        });
     } else {
         initNewTaskModal();
+        initCreateTaskForm();
     }
 })();
 </script>
