@@ -198,4 +198,4 @@ smart-task-manager/
 
 ---
 
-*Built with Flask and a lot of caffeine.*
+*Designed as an adaptive productivity platform for intelligent collaborative workflows.*
