@@ -302,13 +302,18 @@
     function initCreateTaskForm() {
         var form = document.querySelector('#createTaskModal form');
         var submitBtn = document.querySelector('#createTaskModal button[type="submit"]');
-        if (!form || !submitBtn) return;
+        var modalEl = document.getElementById('createTaskModal');
+        if (!form || !submitBtn || !modalEl) return;
+        var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
         submitBtn.addEventListener('click', function(e) {
-            // Let default submit happen, but ensure form is valid
+            e.preventDefault();
+            e.stopPropagation();
             if (form.checkValidity()) {
-                form.submit();
+                modal.hide();
+                setTimeout(function() {
+                    form.submit();
+                }, 50);
             } else {
-                e.preventDefault();
                 form.reportValidity();
             }
         });
